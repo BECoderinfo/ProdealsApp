@@ -1,0 +1,2 @@
+C:/Users/admin/StudioProjects/pro_deals1/android/app/.cxx/Debug/d5z384r7/x86/CMakeFiles/edit_cache.dir
+C:/Users/admin/StudioProjects/pro_deals1/android/app/.cxx/Debug/d5z384r7/x86/CMakeFiles/rebuild_cache.dir
