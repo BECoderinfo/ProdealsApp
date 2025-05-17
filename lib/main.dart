@@ -64,7 +64,8 @@ class ProDeals extends StatelessWidget {
       defaultTransition: Transition.cupertino,
       transitionDuration: Duration(milliseconds: 650),
       title: "Pro Deals",
-      initialRoute: '/',
+      // initialRoute: '/',
+      initialRoute: '/ios_business_address',
       getPages: [
         GetPage(
           name: '/',

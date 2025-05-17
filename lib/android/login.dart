@@ -55,42 +55,6 @@ class login extends GetView<LoginController> {
                       ),
                     ),
                     const Gap(40),
-
-                    /// Mobile number field
-                    // Padding(
-                    //   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    //   child: TextFormField(
-                    //     controller: controller.phone,
-                    //     decoration: InputDecoration(
-                    //       label: Container(
-                    //         height: 30,
-                    //         width: 30,
-                    //         decoration: BoxDecoration(
-                    //           color: AppColor.white,
-                    //           shape: BoxShape.circle,
-                    //         ),
-                    //         alignment: Alignment.center,
-                    //         child: Icon(
-                    //           Icons.call,
-                    //           size: 20,
-                    //         ),
-                    //       ),
-                    //       border: OutlineInputBorder(
-                    //         borderRadius: BorderRadius.circular(10),
-                    //       ),
-                    //       hintText: 'Enter phone Number',
-                    //     ),
-                    //     validator: (num) {
-                    //       if (controller.phone.text.isEmpty) {
-                    //         return 'Enter number';
-                    //       } else if (controller.phone.text.length != 10) {
-                    //         return 'Enter a valid number';
-                    //       }
-                    //       return null;
-                    //     },
-                    //   ),
-                    // ),
-
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: TextFormField(
@@ -210,16 +174,17 @@ class login extends GetView<LoginController> {
                                   var key = controller.formkey.currentState!;
                                   if (key.validate()) {
                                     controller.isProcess.value = true;
+
+                                    // Perform login logic
                                     loginUser(
                                       email: controller.phone.text,
                                       password: controller.password.text,
                                       onDone: () {
-                                        controller.isProcess.value = false;
+                                        controller.isProcess.value =
+                                            false; // Ensure loading stops before navigating
                                         controller.update();
                                       },
                                     );
-                                    // password: 'jay@123',
-                                    // email: 'jayviradiya58885@gmail.com',
                                   }
                                 },
                                 child: Container(

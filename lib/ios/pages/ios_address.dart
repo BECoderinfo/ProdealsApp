@@ -115,6 +115,43 @@ class ios_address extends GetView<BusinessAddressScreenController> {
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 3,
+                                      color: Colors.grey.withOpacity(0.4),
+                                      offset: const Offset(0, 0),
+                                    ),
+                                  ],
+                                  color: Colors.white.withOpacity(1),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                child: CupertinoTextFormFieldRow(
+                                  placeholder: 'Landmark',
+                                  placeholderStyle: const TextStyle(
+                                    color: CupertinoColors.systemGrey,
+                                    fontSize: 16,
+                                  ),
+                                  decoration: const BoxDecoration(),
+                                  style: TextStyle(color: AppColor.black),
+                                  controller:
+                                      bAddressController.landmarkController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Enter landmark';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                            Gap(20),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24.0),
                               child: Obx(
                                 () => Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,78 +160,83 @@ class ios_address extends GetView<BusinessAddressScreenController> {
                                         ? bAddressController.cityList.isNotEmpty
                                             ? Material(
                                                 child: Container(
+                                                  height: 56,
                                                   decoration: BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             10),
                                                     boxShadow: [
                                                       BoxShadow(
-                                                          blurRadius: 3,
-                                                          color: Colors.grey
-                                                              .withOpacity(0.4),
-                                                          offset: const Offset(
-                                                              0, 0)),
+                                                        blurRadius: 3,
+                                                        color: Colors.grey
+                                                            .withOpacity(0.4),
+                                                        offset:
+                                                            const Offset(0, 0),
+                                                      ),
                                                     ],
-                                                    color: Colors.white
-                                                        .withOpacity(1),
+                                                    color: Colors.white,
                                                   ),
                                                   padding:
-                                                      const EdgeInsets.all(8),
-                                                  child: Row(
-                                                    children: [
-                                                      SizedBox(width: 10),
-                                                      Expanded(
-                                                        child: DropdownButton<
-                                                            String>(
-                                                          value:
-                                                              bAddressController
-                                                                  .selectedValue
-                                                                  .value,
-                                                          isExpanded: true,
-                                                          hint: Text(
-                                                            'City',
-                                                            style: TextStyle(
-                                                              color: Color(
-                                                                  0xFF414143),
-                                                            ),
-                                                          ),
-                                                          items: bAddressController
-                                                              .cityList
-                                                              .map<
-                                                                  DropdownMenuItem<
-                                                                      String>>((String
-                                                                  value) {
-                                                            return DropdownMenuItem<
-                                                                String>(
-                                                              value: value,
-                                                              child: Text(
-                                                                value,
-                                                                maxLines: 1,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                              ),
-                                                            );
-                                                          }).toList(),
-                                                          onChanged: (String?
-                                                              newValue) {
+                                                      const EdgeInsets.only(
+                                                          right: 12, left: 34),
+                                                  child: Center(
+                                                    child:
+                                                        DropdownButtonHideUnderline(
+                                                      child: DropdownButton<
+                                                          String>(
+                                                        value:
                                                             bAddressController
                                                                 .selectedValue
-                                                                .value = newValue;
-                                                          },
-                                                          underline: SizedBox(),
+                                                                .value,
+                                                        isExpanded: true,
+                                                        hint: const Text(
+                                                          'City',
                                                           style: TextStyle(
-                                                            color: Color(
-                                                                0xFF414143),
+                                                            color:
+                                                                CupertinoColors
+                                                                    .systemGrey,
                                                             fontSize: 16,
                                                           ),
                                                         ),
+                                                        items: bAddressController
+                                                            .cityList
+                                                            .map<
+                                                                DropdownMenuItem<
+                                                                    String>>(
+                                                              (String value) =>
+                                                                  DropdownMenuItem<
+                                                                      String>(
+                                                                value: value,
+                                                                child: Text(
+                                                                  value,
+                                                                  maxLines: 1,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          16),
+                                                                ),
+                                                              ),
+                                                            )
+                                                            .toList(),
+                                                        onChanged:
+                                                            (String? newValue) {
+                                                          bAddressController
+                                                              .selectedValue
+                                                              .value = newValue;
+                                                        },
+                                                        style: const TextStyle(
+                                                          color:
+                                                              Color(0xFF414143),
+                                                          fontSize: 16,
+                                                        ),
                                                       ),
-                                                    ],
+                                                    ),
                                                   ),
                                                 ),
                                               )
-                                            : Gap(0)
+                                            : const SizedBox.shrink()
                                         : CustomCircularIndicator(
                                             color: AppColor.primary),
                                   ],

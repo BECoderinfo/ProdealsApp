@@ -13,6 +13,10 @@ class CartController extends GetxController {
     );
   }
 
+  void clearCartData() {
+    qtyList.clear();
+  }
+
   RxList<int> qtyList = <int>[].obs;
 
   getCartItem({required String uId}) async {

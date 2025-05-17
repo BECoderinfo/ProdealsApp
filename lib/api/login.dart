@@ -16,8 +16,6 @@ Future<void> loginUser({
       },
     );
 
-    log("hello----------");
-
     if (response != null) {
       final userdata = await ApiService.getApi(
         Apis.sequreUser,
@@ -25,20 +23,23 @@ Future<void> loginUser({
           'token': response['usertoken'],
         },
       );
+
       UserDataStorageServices.writeData(
         key: UserStorageDataKeys.loggedIn,
         data: true,
       );
+
       UserDataStorageServices.writeData(
         key: UserStorageDataKeys.userData,
         data: jsonEncode(userdata),
       );
+
       UserDataStorageServices.writeData(
         key: UserStorageDataKeys.token,
         data: response['usertoken'],
       );
-      UserLoginData loginData = UserLoginData.fromJson(userdata);
 
+      UserLoginData loginData = UserLoginData.fromJson(userdata);
       id = loginData.data?.sId ?? "";
       UserName = loginData.data?.userName ?? "";
       Email = loginData.data?.email ?? "";
@@ -65,6 +66,7 @@ Future<void> loginUser({
         key: UserStorageDataKeys.isBusiness,
         data: loginData.data?.isBusiness ?? false,
       );
+
       if (userdata['data']['image'] != null) {
         UserDataStorageServices.writeData(
           key: UserStorageDataKeys.imageData,
@@ -73,7 +75,8 @@ Future<void> loginUser({
       }
 
       ShowToast.toast(msg: response['message'] ?? "Login success.");
-      onDone();
+
+      // Move the navigation logic inside here
       if (userdata['data']['businessId'] != null &&
           userdata['data']['isBusiness']) {
         bool b =
@@ -113,8 +116,10 @@ Future<void> loginUser({
           (route) => route.isFirst,
         );
       }
+
+      onDone(); // Only call onDone once all operations are completed
     } else {
-      onDone();
+      onDone(); // If the response is null, call onDone immediately.
     }
   } catch (error) {
     onDone();

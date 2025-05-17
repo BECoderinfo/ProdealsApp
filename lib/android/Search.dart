@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gap/gap.dart';
 import 'package:pro_deals1/utils/colors.dart';
-import '../widget/floating_searchbar.dart';
 
-class SearchPage extends StatefulWidget {
+import '../controller/search/search_controller.dart';
+
+class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
 
   @override
-  _SearchPageState createState() => _SearchPageState();
-}
-
-class _SearchPageState extends State<SearchPage> {
-  String selectedCategory = '';
-
-  @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
+    final SearchControllers controller = Get.put(SearchControllers());
 
     return Scaffold(
       appBar: AppBar(
@@ -36,85 +29,123 @@ class _SearchPageState extends State<SearchPage> {
             onPressed: () {
               Get.toNamed('/Filter');
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.filter_alt_outlined,
               size: 28,
             ),
           ),
         ],
       ),
-      body: Container(
-        width: width,
+      body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Stack(
-          fit: StackFit.expand,
+        child: Column(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Search Bar
+            Obx(
+              () => Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: [
+                    const Icon(Icons.search, color: Colors.black),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        onChanged: controller.updateSearch,
+                        decoration: const InputDecoration(
+                          hintText: 'Search...',
+                          hintStyle: TextStyle(fontStyle: FontStyle.italic),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    if (controller.searchText.value.isNotEmpty)
+                      GestureDetector(
+                        onTap: controller.clearSearch,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white54,
+                          ),
+                          child: const Icon(Icons.close, size: 18),
+                        ),
+                      )
+                  ],
+                ),
+              ),
+            ),
+            const Gap(16),
+
+            // Category Chips
+            Wrap(
+              spacing: 8,
               children: [
-                const Gap(80),
-                Text(
-                  'All Categories',
-                  style: GoogleFonts.openSans(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                    color: AppColor.black300,
-                  ),
-                ),
-                const Gap(20),
-                Expanded(
-                  child: Wrap(
-                    spacing: 16,
-                    runSpacing: 12,
-                    children: [
-                      _buildCategoryChip('North Indian', Icons.local_dining),
-                      _buildCategoryChip('Pizza', Icons.local_pizza),
-                      _buildCategoryChip('Shake', Icons.local_cafe),
-                      _buildCategoryChip('Desserts', Icons.cake),
-                      _buildCategoryChip('Chocolate', Icons.ac_unit),
-                    ],
-                  ),
-                ),
+                _buildCategoryChip(controller, 'North Indian'),
+                _buildCategoryChip(controller, 'Pizza'),
+                _buildCategoryChip(controller, 'Shake'),
+                _buildCategoryChip(controller, 'Desserts'),
+                _buildCategoryChip(controller, 'Chocolate'),
               ],
             ),
-            buildFloatingSearchBar(context),
+            const Gap(16),
+
+            // Search Results
+            Expanded(
+              child: Obx(() {
+                final results = controller.filteredItems;
+                if (results.isEmpty) {
+                  return const Center(child: Text("No results found."));
+                }
+                return ListView.builder(
+                  itemCount: results.length,
+                  itemBuilder: (context, index) {
+                    final item = results[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      child: ListTile(
+                        title: Text(item['name']!),
+                        subtitle: Text(item['category']!),
+                        leading: const Icon(Icons.fastfood),
+                      ),
+                    );
+                  },
+                );
+              }),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCategoryChip(String label, IconData icon) {
-    bool isSelected = selectedCategory == label;
-
-    return ChoiceChip(
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 20, color: isSelected ? Colors.white : Colors.black),
-          const Gap(4),
-          Text(
-            label,
-            style: GoogleFonts.openSans(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: isSelected ? Colors.white : Colors.black,
-            ),
+  Widget _buildCategoryChip(SearchControllers controller, String label) {
+    return Obx(() {
+      bool isSelected = controller.selectedCategory.value == label;
+      return ChoiceChip(
+        label: Text(
+          label,
+          style: GoogleFonts.openSans(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: isSelected ? Colors.white : Colors.black,
           ),
-        ],
-      ),
-      selected: isSelected,
-      backgroundColor: Colors.grey.shade200,
-      selectedColor: AppColor.primary,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      onSelected: (bool selected) {
-        setState(() {
-          selectedCategory = selected ? label : '';
-        });
-      },
-    );
+        ),
+        selected: isSelected,
+        backgroundColor: Colors.grey.shade200,
+        selectedColor: AppColor.primary,
+        onSelected: (selected) {
+          if (selected) {
+            controller.selectCategory(label);
+          } else {
+            controller.clearCategory();
+          }
+        },
+      );
+    });
   }
 }

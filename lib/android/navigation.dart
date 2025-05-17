@@ -30,6 +30,7 @@ class _navigationState extends State<navigation> {
         animation: currentPageIndex,
         builder: (context, child) {
           return PageView(
+            physics: NeverScrollableScrollPhysics(),
             onPageChanged: (value) {
               if (currentPageIndex == 0) {
                 // Get.delete<HomePageController>();
@@ -47,84 +48,90 @@ class _navigationState extends State<navigation> {
           );
         },
       ),
-      bottomNavigationBar: AnimatedBuilder(
-        animation: currentPageIndex,
-        builder: (context, child) {
-          return BottomNavigationBar(
-            backgroundColor: AppColor.primary,
-            currentIndex: currentPageIndex.value,
-            onTap: (value) {
-              setState(() {
-                currentPageIndex.value = value;
-                pageController.jumpToPage(
-                  value,
-                );
-              });
-            },
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: AppColor.white,
-            unselectedItemColor: AppColor.black300,
-            elevation: 2,
-            items: [
-              BottomNavigationBarItem(
-                icon: Container(
-                  height: 20,
-                  width: 20,
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset('assets/icons/B_home.svg'),
-                ),
-                activeIcon: Container(
+      bottomNavigationBar: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        child: AnimatedBuilder(
+          animation: currentPageIndex,
+          builder: (context, child) {
+            return BottomNavigationBar(
+              backgroundColor: AppColor.primary,
+              currentIndex: currentPageIndex.value,
+              onTap: (value) {
+                setState(() {
+                  currentPageIndex.value = value;
+                  pageController.jumpToPage(
+                    value,
+                  );
+                });
+              },
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: AppColor.white,
+              unselectedItemColor: AppColor.black300,
+              elevation: 2,
+              items: [
+                BottomNavigationBarItem(
+                  icon: Container(
                     height: 20,
                     width: 20,
                     alignment: Alignment.center,
-                    child: SvgPicture.asset('assets/icons/home.svg')),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Container(
-                  height: 20,
-                  width: 20,
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset('assets/icons/cart.svg'),
+                    child: SvgPicture.asset('assets/icons/B_home.svg'),
+                  ),
+                  activeIcon: Container(
+                      height: 20,
+                      width: 20,
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset('assets/icons/home.svg')),
+                  label: 'Home',
                 ),
-                activeIcon: Container(
+                BottomNavigationBarItem(
+                  icon: Container(
                     height: 20,
                     width: 20,
                     alignment: Alignment.center,
-                    child: SvgPicture.asset('assets/icons/W_cart.svg')),
-                label: 'Cart',
-              ),
-              BottomNavigationBarItem(
-                icon: Container(
-                  height: 20,
-                  width: 20,
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset('assets/icons/qr_code.svg'),
+                    child: SvgPicture.asset('assets/icons/cart.svg'),
+                  ),
+                  activeIcon: Container(
+                      height: 20,
+                      width: 20,
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset('assets/icons/W_cart.svg')),
+                  label: 'Cart',
                 ),
-                activeIcon: Container(
+                BottomNavigationBarItem(
+                  icon: Container(
                     height: 20,
                     width: 20,
                     alignment: Alignment.center,
-                    child: SvgPicture.asset('assets/icons/W_qr_code.svg')),
-                label: 'Scan',
-              ),
-              BottomNavigationBarItem(
-                icon: Container(
-                  height: 20,
-                  width: 20,
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset('assets/icons/A_user.svg'),
+                    child: SvgPicture.asset('assets/icons/qr_code.svg'),
+                  ),
+                  activeIcon: Container(
+                      height: 20,
+                      width: 20,
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset('assets/icons/W_qr_code.svg')),
+                  label: 'Scan',
                 ),
-                activeIcon: Container(
+                BottomNavigationBarItem(
+                  icon: Container(
                     height: 20,
                     width: 20,
                     alignment: Alignment.center,
-                    child: SvgPicture.asset('assets/icons/W_A_user.svg')),
-                label: 'Profile',
-              ),
-            ],
-          );
-        },
+                    child: SvgPicture.asset('assets/icons/A_user.svg'),
+                  ),
+                  activeIcon: Container(
+                      height: 20,
+                      width: 20,
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset('assets/icons/W_A_user.svg')),
+                  label: 'Profile',
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

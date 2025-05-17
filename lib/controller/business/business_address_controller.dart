@@ -44,6 +44,7 @@ class BusinessAddressScreenController extends GetxController {
   final TextEditingController stateController = TextEditingController();
   final TextEditingController pincodeController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+  final TextEditingController landmarkController = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
 
@@ -59,6 +60,7 @@ class BusinessAddressScreenController extends GetxController {
             "businessName": Get.arguments['name'],
             "contactNumber": Get.arguments['phone'],
             "address": addressController.text,
+            "landmark": landmarkController.text,
             "state": stateController.text,
             "city": selectedValue.value ?? "",
             "pincode": pincodeController.text,

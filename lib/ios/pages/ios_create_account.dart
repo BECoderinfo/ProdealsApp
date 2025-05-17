@@ -91,28 +91,33 @@ class ios_create_account extends GetView<CreateBusinessScreenController> {
                                   ),
                                 ),
                                 Positioned(
-                                  bottom: -1,
-                                  right: -1,
+                                  bottom: 6,
+                                  right: 6,
                                   child: Container(
-                                    padding: EdgeInsets.all(1),
+                                    padding: EdgeInsets.all(2),
                                     decoration: BoxDecoration(
                                       color: AppColor.white,
                                       shape: BoxShape.circle,
                                     ),
-                                    child: IconButton(
-                                      onPressed: () {
-                                        FocusScope.of(context).unfocus();
-                                        bController.imagepicker(context);
-                                      },
-                                      icon: Icon(
-                                        Icons.edit,
-                                        color: AppColor.white,
-                                        size: 20,
-                                      ),
-                                      style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all(
-                                                AppColor.black300),
+                                    alignment: Alignment.center,
+                                    child: SizedBox(
+                                      height: 28,
+                                      width: 28,
+                                      child: RawMaterialButton(
+                                        onPressed: () {
+                                          FocusScope.of(context).unfocus();
+                                          bController.imagepicker(context);
+                                        },
+                                        fillColor: AppColor.black300,
+                                        shape: const CircleBorder(),
+                                        child: const Icon(
+                                          Icons.edit,
+                                          size: 14, // smaller icon
+                                          color: Colors.white,
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                        // remove padding for a tighter fit
+                                        elevation: 2,
                                       ),
                                     ),
                                   ),

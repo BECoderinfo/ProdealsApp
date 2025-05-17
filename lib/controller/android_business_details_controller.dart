@@ -6,6 +6,27 @@ class AndroidBusinessDetailController extends GetxController {
 
   final data = Get.arguments;
 
+  RxDouble ratting = (0.0).obs;
+  BusinessDetailModel? details;
+  RxList<OfferListModel> offerList = <OfferListModel>[].obs;
+  RxList<CartListModel> cartList = <CartListModel>[].obs;
+  List<Widget> daysList = [];
+
+  RxBool isLoaded = false.obs;
+  RxBool isError = false.obs;
+  RxBool isOfferLoaded = false.obs;
+  RxBool isError1 = false.obs;
+  RxBool isFavourite = false.obs;
+
+  RxString deleteCartId = "".obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    checkFavourite();
+    getBusinessDetail(bId: data['rId']);
+  }
+
   Widget buildInfoCard(
       double height, double width, IconData icon, String text) {
     return Container(
@@ -13,7 +34,6 @@ class AndroidBusinessDetailController extends GetxController {
       width: width / 4,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(icon, color: AppColor.primary),
           Row(
@@ -42,7 +62,7 @@ class AndroidBusinessDetailController extends GetxController {
     return GestureDetector(
       onTap: () async {
         selectedIndex.value = index;
-        if (!isOfferLoaded.value && selectedIndex.value == 1) {
+        if (!isOfferLoaded.value && index == 1) {
           await getCart();
           await getOfferById(bId: data['rId']);
         }
@@ -68,70 +88,49 @@ class AndroidBusinessDetailController extends GetxController {
     );
   }
 
-  RxDouble ratting = (0.0).obs;
-
-  getRatting({required String bId}) async {
+  Future<void> getRatting({required String bId}) async {
     try {
-      final response = await ApiService.getApi(
-        Apis.businessRatting(bId: bId),
-      );
-
+      final response = await ApiService.getApi(Apis.businessRatting(bId: bId));
       if (response != null) {
-        ratting.value = double.parse("${response['averageRating'] ?? "0"}");
+        ratting.value =
+            double.tryParse("${response['averageRating'] ?? "0"}") ?? 0.0;
       }
-    } catch (e) {}
+    } catch (_) {}
   }
 
-  getBusinessDetail({required String bId}) async {
+  Future<void> getBusinessDetail({required String bId}) async {
     isLoaded.value = false;
     try {
-      final response = await ApiService.getApi(
-        Apis.businessDetail(bId: bId),
-      );
-
+      final response = await ApiService.getApi(Apis.businessDetail(bId: bId));
       if (response != null) {
         details = BusinessDetailModel.fromJson(response);
-
-        if (!(details?.business?.offDays == 'null' ||
-            details?.business?.offDays == null)) {
-          List<String> daysOfWeek = [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-          ];
-
-          for (String day in daysOfWeek) {
-            if (day == details?.business?.offDays) {
-              daysList.add(
-                Text(
-                  "$day - closed",
-                  style: GoogleFonts.openSans(
-                    color: AppColor.red,
-                    fontSize: 15,
-                  ),
-                ),
-              );
-            } else {
-              daysList.add(
-                Text(
-                  "$day ${details?.business?.openTime ?? ""} to ${details?.business?.closeTime ?? ""}",
-                  style: GoogleFonts.openSans(
-                    fontSize: 15,
-                    color: AppColor.gray,
-                  ),
-                ),
-              );
-            }
-          }
+        daysList.clear();
+        List<String> daysOfWeek = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ];
+        for (String day in daysOfWeek) {
+          bool isClosed = day == details?.business?.offDays;
+          daysList.add(
+            Text(
+              isClosed
+                  ? "$day - closed"
+                  : "$day ${details?.business?.openTime ?? ""} to ${details?.business?.closeTime ?? ""}",
+              style: GoogleFonts.openSans(
+                fontSize: 15,
+                color: isClosed ? AppColor.red : AppColor.gray,
+              ),
+            ),
+          );
         }
         await getRatting(bId: bId);
         await getCart();
-        Map<String, dynamic> d = data as Map<String, dynamic>;
-        if (d.containsKey('page')) {
+        if ((data as Map<String, dynamic>).containsKey('page')) {
           selectedIndex.value = 1;
           await getOfferById(bId: data['rId']);
         }
@@ -139,239 +138,92 @@ class AndroidBusinessDetailController extends GetxController {
       } else {
         isError.value = true;
       }
-    } catch (error) {
+    } catch (e) {
       isError.value = true;
-      ShowToast.errorSnackbar(
-        title: "Error",
-        msg: "$error",
-      );
+      ShowToast.errorSnackbar(title: "Error", msg: "$e");
     }
   }
 
-  BusinessDetailModel? details;
-  RxList<OfferListModel> offerList = <OfferListModel>[].obs;
-  RxList<CartListModel> cartList = <CartListModel>[].obs;
-
-  List<Widget> daysList = [];
-
-  RxBool isLoaded = false.obs;
-  RxBool isError = false.obs;
-  RxBool isOfferLoaded = false.obs;
-  RxBool isError1 = false.obs;
-  RxBool isFavourite = false.obs;
-
-  @override
-  void onInit() {
-    // TODO: implement onInit
-    super.onInit();
-    checkFavourite();
-    getBusinessDetail(bId: data['rId']);
-  }
-
-  checkFavourite() {
-    dynamic list = UserDataStorageServices.readData(
+  Future<void> checkFavourite() async {
+    final storedList = UserDataStorageServices.readData(
         key: UserStorageDataKeys.favouriteBusiness);
-    if (list != null) {
+    if (storedList != null && storedList is List) {
       try {
-        int i = list.indexWhere(
-          (element) => element.sId == data['rId'],
-        );
-
-        if (i != -1) {
-          isFavourite.value = true;
-        }
-      } catch (e) {}
+        final List<FavouriteBusinessList> favList =
+            storedList.map((e) => FavouriteBusinessList.fromJson(e)).toList();
+        isFavourite.value =
+            favList.any((element) => element.sId == data['rId']);
+      } catch (_) {}
     }
   }
 
-  favouriteManage() {
-    dynamic list = UserDataStorageServices.readData(
-            key: UserStorageDataKeys.favouriteBusiness) ??
-        [];
+  void favouriteManage() {
+    final storedList = UserDataStorageServices.readData(
+        key: UserStorageDataKeys.favouriteBusiness);
+    List<FavouriteBusinessList> favList =
+        storedList != null && storedList is List
+            ? storedList.map((e) => FavouriteBusinessList.fromJson(e)).toList()
+            : [];
+
     if (isFavourite.value) {
-      list.removeWhere(
-        (e) => e.sId == details?.business?.sId,
-      );
-
-      isFavourite.value = !isFavourite.value;
-
-      if (list.isEmpty) {
-        UserDataStorageServices.removeData(
-          key: UserStorageDataKeys.favouriteBusiness,
-        );
-      } else {
-        UserDataStorageServices.writeData(
-          key: UserStorageDataKeys.favouriteBusiness,
-          data: list.map((e) => e.toJson()).toList(),
-        );
-      }
+      favList.removeWhere((e) => e.sId == details?.business?.sId);
     } else {
-      FavouriteBusinessList f = FavouriteBusinessList(
+      favList.add(FavouriteBusinessList(
         address:
             '${details?.business?.address ?? ""}\n${details?.business?.city ?? ""}, ${details?.business?.state ?? ""} ${details?.business?.pincode ?? ""}',
         name: details?.business?.businessName ?? "",
         sId: details?.business?.sId ?? "",
         image: details?.business?.mainImage?.data?.data ?? [],
         ratting: "${ratting.value}",
-      );
+      ));
+    }
 
-      list.add(f);
-
+    if (favList.isEmpty) {
+      UserDataStorageServices.removeData(
+          key: UserStorageDataKeys.favouriteBusiness);
+    } else {
       UserDataStorageServices.writeData(
         key: UserStorageDataKeys.favouriteBusiness,
-        data: list.map((e) => e.toJson()).toList(),
+        data: favList.map((e) => e.toJson()).toList(),
       );
-      isFavourite.value = !isFavourite.value;
     }
+    isFavourite.toggle();
   }
 
   bool getButtonName({required OfferListModel offerId}) {
-    if (cartList.isEmpty) {
-      return true;
-    }
+    return !cartList.any((e) => offerId.sId == e.offer?.sId);
+  }
 
-    for (var e in cartList) {
-      if (offerId.sId == e.offer?.sId) {
-        return false;
+  Future<void> getCart() async {
+    try {
+      final uId =
+          UserDataStorageServices.readData(key: UserStorageDataKeys.uId) ?? "";
+      final response = await ApiService.getApi(Apis.getCartByUserId(uId: uId));
+      if (response != null &&
+          response['cart'] != null &&
+          response['cart'][0]['items'] is List) {
+        cartList.value = (response['cart'][0]['items'] as List)
+            .map((e) => CartListModel.fromJson(e))
+            .toList();
       }
-    }
-    return true;
+    } catch (_) {}
   }
 
-  getCart() async {
+  Future<void> getOfferById({required String bId}) async {
     try {
-      final response = await ApiService.getApi(
-        Apis.getCartByUserId(
-            uId: UserDataStorageServices.readData(
-                    key: UserStorageDataKeys.uId) ??
-                ""),
-      );
-
-      if (response != null) {
-        if (response['cart'][0]['items'] is List &&
-            response['cart'][0]['items'].isNotEmpty) {
-          cartList.clear();
-          response['cart'][0]['items']
-              .map(
-                (e) => cartList.add(CartListModel.fromJson(e)),
-              )
-              .toList();
-        }
-      }
-    } catch (e) {}
-  }
-
-  TimeOfDay parseTimeOfDay(String time) {
-    try {
-      final format = DateFormat('hh:mm a');
-      DateTime dateTime =
-          format.parse(time.replaceAll(RegExp(r'[^\x20-\x7E]'), '').trim());
-      return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
-    } catch (e) {
-      return TimeOfDay(hour: 0, minute: 0);
-    }
-  }
-
-  TimeOfDay subtractTimeOfDay(TimeOfDay time, int hours) {
-    final dateTime = DateTime(0, 1, 1, time.hour, time.minute)
-        .subtract(Duration(hours: hours));
-    return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
-  }
-
-  String getStatus({
-    required String openTimeStr,
-    required String closeTimeStr,
-  }) {
-    TimeOfDay openTime = parseTimeOfDay(openTimeStr);
-    TimeOfDay closeTime = parseTimeOfDay(closeTimeStr);
-    TimeOfDay openSoonTime = subtractTimeOfDay(openTime, 2);
-    TimeOfDay currentTime = TimeOfDay.now();
-
-    DateTime toDateTime(TimeOfDay time) {
-      final now = DateTime.now();
-      return DateTime(now.year, now.month, now.day, time.hour, time.minute);
-    }
-
-    DateTime current = toDateTime(currentTime);
-    DateTime open = toDateTime(openTime);
-    DateTime close = toDateTime(closeTime);
-    DateTime openSoon = toDateTime(openSoonTime);
-
-    if (current.isAfter(openSoon) && current.isBefore(open)) {
-      return "Open Soon";
-    } else if (current.isAfter(open) && current.isBefore(close)) {
-      return "Open Now";
-    } else {
-      return "Closed";
-    }
-  }
-
-  String parseTime(String s) {
-    try {
-      s = s
-          .trim()
-          .replaceAll(RegExp(r'\s+'), ' ')
-          .toUpperCase(); // Normalize and uppercase
-
-      final parsed = DateFormat("h:mm a").parse(s);
-      final formatted = DateFormat("h a").format(parsed); // Only hour and AM/PM
-      return formatted;
-    } catch (e) {
-      return "";
-    }
-  }
-
-  String calculateTimeDifference({required String createdDateStr}) {
-    DateTime currentDate = DateTime.now();
-
-    DateTime createdDate = DateTime.parse(createdDateStr);
-
-    Duration difference = currentDate.difference(createdDate);
-    int diffDays = difference.inDays;
-    int diffMonths = (currentDate.year - createdDate.year) * 12 +
-        (currentDate.month - createdDate.month);
-    int diffYears = currentDate.year - createdDate.year;
-
-    if (diffDays == 0) {
-      return "Just arrived";
-    } else if (diffDays < 30) {
-      return "${diffDays} days ago";
-    } else if (diffDays >= 30 && diffMonths < 12) {
-      return "${diffMonths} months ago";
-    } else if (diffYears >= 1) {
-      return "${diffYears} years ago";
-    } else {
-      return "Unknown status";
-    }
-  }
-
-  getOfferById({required String bId}) async {
-    try {
-      final response = await ApiService.getApi(
-        Apis.getOfferByBusinessId(bId: bId),
-      );
-
-      if (response != null) {
-        if (response['offers'] is List && response['offers'].isNotEmpty) {
-          offerList.clear();
-          response['offers']
-              .map(
-                (e) => offerList.add(OfferListModel.fromJson(e)),
-              )
-              .toList();
-        }
+      final response =
+          await ApiService.getApi(Apis.getOfferByBusinessId(bId: bId));
+      if (response != null && response['offers'] is List) {
+        offerList.value = response['offers']
+            .map<OfferListModel>((e) => OfferListModel.fromJson(e))
+            .toList();
       }
       isOfferLoaded.value = true;
-    } catch (error) {
+    } catch (e) {
       isError1.value = true;
-      ShowToast.errorSnackbar(
-        title: "Error",
-        msg: "$error",
-      );
+      ShowToast.errorSnackbar(title: "Error", msg: "$e");
     }
   }
-
-  RxString deleteCartId = "".obs;
 
   void addToCartItem({required String oId}) async {
     deleteCartId.value = oId;
@@ -382,54 +234,89 @@ class AndroidBusinessDetailController extends GetxController {
           "user":
               UserDataStorageServices.readData(key: UserStorageDataKeys.uId) ??
                   "",
-          "offerId": oId
+          "offerId": oId,
         },
       );
-      if (response != null) {
-        await getCart();
-        deleteCartId.value = "";
-      } else {
-        deleteCartId.value = "";
-      }
+      if (response != null) await getCart();
     } catch (error) {
+      ShowToast.errorSnackbar(title: "Error", msg: "$error");
+    } finally {
       deleteCartId.value = "";
-      ShowToast.errorSnackbar(
-        title: "Error",
-        msg: "$error",
-      );
     }
   }
 
   void deleteItem({required String oId}) async {
-    String cartId = "";
-    print('oId :: ${oId}');
-    for (var e in cartList) {
-      if (e.offer?.sId == oId) {
-        cartId = e.sId ?? "";
-      }
-    }
+    final cartItem = cartList.firstWhereOrNull((e) => e.offer?.sId == oId);
+    if (cartItem == null) return;
     deleteCartId.value = oId;
     try {
       final response = await ApiService.deleteApi(
-        Apis.deleteCart(cartId: cartId),
-      );
-
+          Apis.deleteCart(cartId: cartItem.sId ?? ""));
       if (response != null) {
-        for (var e in cartList) {
-          if (e.offer?.sId == oId) {
-            cartList.remove(e);
-            break;
-          }
-        }
-        deleteCartId.value = "";
-      } else {
-        deleteCartId.value = "";
+        cartList.remove(cartItem);
       }
     } catch (error) {
-      ShowToast.errorSnackbar(
-        title: "Error",
-        msg: "$error",
-      );
+      ShowToast.errorSnackbar(title: "Error", msg: "$error");
+    } finally {
+      deleteCartId.value = "";
     }
+  }
+
+  // Time Parsing / Formatting Utilities
+  TimeOfDay parseTimeOfDay(String time) {
+    try {
+      final format = DateFormat('hh:mm a');
+      final cleaned = time.replaceAll(RegExp(r'[^\x20-\x7E]'), '').trim();
+      DateTime dt = format.parse(cleaned);
+      return TimeOfDay(hour: dt.hour, minute: dt.minute);
+    } catch (_) {
+      return TimeOfDay(hour: 0, minute: 0);
+    }
+  }
+
+  TimeOfDay subtractTimeOfDay(TimeOfDay time, int hours) {
+    final dt = DateTime(0, 1, 1, time.hour, time.minute)
+        .subtract(Duration(hours: hours));
+    return TimeOfDay(hour: dt.hour, minute: dt.minute);
+  }
+
+  String getStatus(
+      {required String openTimeStr, required String closeTimeStr}) {
+    TimeOfDay now = TimeOfDay.now();
+    TimeOfDay open = parseTimeOfDay(openTimeStr);
+    TimeOfDay close = parseTimeOfDay(closeTimeStr);
+    TimeOfDay soon = subtractTimeOfDay(open, 2);
+
+    DateTime toDT(TimeOfDay t) => DateTime(0, 0, 0, t.hour, t.minute);
+    final current = toDT(now),
+        openDT = toDT(open),
+        closeDT = toDT(close),
+        soonDT = toDT(soon);
+
+    if (current.isAfter(soonDT) && current.isBefore(openDT)) return "Open Soon";
+    if (current.isAfter(openDT) && current.isBefore(closeDT)) return "Open Now";
+    return "Closed";
+  }
+
+  String parseTime(String s) {
+    try {
+      final parsed = DateFormat("h:mm a").parse(s.trim().toUpperCase());
+      return DateFormat("h a").format(parsed);
+    } catch (_) {
+      return "";
+    }
+  }
+
+  String calculateTimeDifference({required String createdDateStr}) {
+    DateTime current = DateTime.now();
+    DateTime created = DateTime.parse(createdDateStr);
+    Duration diff = current.difference(created);
+
+    if (diff.inDays == 0) return "Just arrived";
+    if (diff.inDays < 30) return "${diff.inDays} days ago";
+    int months =
+        (current.year - created.year) * 12 + (current.month - created.month);
+    if (months < 12) return "$months months ago";
+    return "${current.year - created.year} years ago";
   }
 }

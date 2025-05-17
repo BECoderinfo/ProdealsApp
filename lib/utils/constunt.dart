@@ -89,7 +89,7 @@ bool isBusiness = false;
 var ImageB = "";
 
 // String host = "http://141.148.196.197:3001/";
-String host = "http://192.168.1.7:3001/";
+String host = "http://192.168.1.6:3001/";
 // String host = "https://prodeal.onrender.com/";
 
 class Apis {
@@ -97,7 +97,7 @@ class Apis {
   static const Map<String, String> headersValue = {
     'Content-Type': 'application/json'
   };
-  static const String serverAddress = "http://192.168.1.7:3001/";
+  static const String serverAddress = "http://192.168.1.6:3001/";
 
   // static const String serverAddress = "http://141.148.196.197:3001/";
 
@@ -276,4 +276,10 @@ class Apis {
       Uri.parse("${serverAddress}subscription/getByUserId/${uId}");
 
   static Uri createRating = Uri.parse("${serverAddress}rating/add");
+
+  static Uri getRatingByUIdBId({required String bId, required String uId}) =>
+      Uri.parse("${serverAddress}rating/getByUserId/$uId/$bId");
+
+  static Uri updateRating({required String rId}) =>
+      Uri.parse("${serverAddress}rating/update/$rId");
 }

@@ -30,10 +30,12 @@ class Cart extends GetView<CartController> {
                           Gap(25),
                           Expanded(
                             child: Text(
-                              "Something went wrong please try again.",
+                              "Something went wrong, please try again.",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w700),
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                           Gap(25),
@@ -44,22 +46,41 @@ class Cart extends GetView<CartController> {
                 : !cartController.isLoaded.value
                     ? CustomCircularIndicator(color: AppColor.primary)
                     : cartController.cartList.isEmpty
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Your cart is empty",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700),
+                        ? SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 200,
+                                  width: 180,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                          "assets/images/cart_images.png"),
+                                    ),
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                                Gap(10),
+                                Text(
+                                  "Your cart is empty",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Gap(10),
+                                Text(
+                                  "Add items to your cart to get started",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
                           )
                         : Padding(
                             padding: const EdgeInsets.all(16),
@@ -74,6 +95,7 @@ class Cart extends GetView<CartController> {
                                     key: ValueKey('order$index'),
                                     endActionPane: ActionPane(
                                       motion: const DrawerMotion(),
+                                      // Prevents automatic closing when an action is taken
                                       children: [
                                         SlidableAction(
                                           onPressed: (_) => cartController
@@ -82,6 +104,14 @@ class Cart extends GetView<CartController> {
                                           foregroundColor: Colors.white,
                                           icon: Icons.delete,
                                           label: 'Delete',
+                                          autoClose: false,
+                                          spacing: 10,
+                                          // Adjust the space between actions (optional)
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 16),
+                                          // Adjust padding to prevent oversize
+                                          flex: 1,
+                                          // Ensures the action button takes up the full available width of the pane
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
@@ -98,7 +128,8 @@ class Cart extends GetView<CartController> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                  '${(cartController.qtyList[index])} x ₹ ${data.offer?.paymentAmount ?? 0}'),
+                                                '${(cartController.qtyList[index])} x ₹ ${data.offer?.paymentAmount ?? 0}',
+                                              ),
                                               const Gap(4),
                                               Row(
                                                 children: [
@@ -126,35 +157,10 @@ class Cart extends GetView<CartController> {
                                                                       .qtyList[
                                                                   index]--;
                                                             }
-                                                            if (controller
-                                                                .pCodeData
-                                                                .value
-                                                                .isNotEmpty) {
-                                                              if (controller
-                                                                      .getTotal() <
-                                                                  (int.tryParse(cartController
-                                                                              .pCode
-                                                                              .value
-                                                                              ?.neededAmount ??
-                                                                          '0') ??
-                                                                      double.parse(cartController
-                                                                              .pCode
-                                                                              .value
-                                                                              ?.neededAmount ??
-                                                                          "0"))) {
-                                                                cartController
-                                                                    .pCodeData
-                                                                    .value = "";
-                                                                cartController
-                                                                    .pCodeValue
-                                                                    .value = "";
-                                                              }
-                                                            }
                                                           },
                                                           child: cartController
                                                               .buildQuantityButton(
-                                                            Icons.remove,
-                                                          ),
+                                                                  Icons.remove),
                                                         ),
                                                         const Gap(10),
                                                         Text(
@@ -165,41 +171,13 @@ class Cart extends GetView<CartController> {
                                                             cartController
                                                                     .qtyList[
                                                                 index]++;
-                                                            if (controller.pCode
-                                                                        .value !=
-                                                                    null &&
-                                                                controller
-                                                                    .pCodeData
-                                                                    .value
-                                                                    .isEmpty) {
-                                                              if (controller
-                                                                      .getTotal() >
-                                                                  (int.tryParse(cartController
-                                                                              .pCode
-                                                                              .value
-                                                                              ?.neededAmount ??
-                                                                          '0') ??
-                                                                      double.parse(cartController
-                                                                              .pCode
-                                                                              .value
-                                                                              ?.neededAmount ??
-                                                                          "0"))) {
-                                                                cartController
-                                                                        .pCodeData
-                                                                        .value =
-                                                                    "(${cartController.pCode.value?.promocode ?? ""} - ${cartController.pCode.value?.discount ?? 0}${cartController.pCode.value?.discountType == "Amount" ? '₹' : '%'})";
-                                                                cartController
-                                                                        .pCodeValue
-                                                                        .value =
-                                                                    "${cartController.pCode.value?.discount ?? 0}${cartController.pCode.value?.discountType == "Amount" ? '₹' : '%'}";
-                                                              }
-                                                            }
                                                           },
                                                           child: cartController
                                                               .buildQuantityButton(
-                                                                  Icons.add,
-                                                                  color: AppColor
-                                                                      .primary),
+                                                            Icons.add,
+                                                            color: AppColor
+                                                                .primary,
+                                                          ),
                                                         ),
                                                       ],
                                                     ),

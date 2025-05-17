@@ -14,6 +14,10 @@ class UserOrderDetailController extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
+    rate.value = 0.0;
+    comment.clear();
+    ratingId = null;
+    isRated.value = false;
     getOrderDetails();
   }
 
@@ -21,6 +25,10 @@ class UserOrderDetailController extends GetxController {
   RxBool isLoaded = false.obs;
   RxBool isError = false.obs;
   RxString oStatus = "".obs;
+
+  String? ratingId;
+
+  RxBool isRated = false.obs;
 
   RxBool isRate = false.obs;
 
@@ -68,6 +76,7 @@ class UserOrderDetailController extends GetxController {
       if (response != null && response['data'] != null) {
         orderDetails = OrderListModel.fromJson(response['data']);
         oStatus.value = getStatusName().first;
+        getRating();
         isLoaded.value = true;
       } else {
         isError.value = true;
@@ -160,23 +169,64 @@ class UserOrderDetailController extends GetxController {
     }
   }
 
-  void rateUs() async {
+  getRating() async {
     try {
       isRate.value = true;
-      final response = await ApiService.postApi(
-        Apis.createRating,
-        body: {
-          "businessId": orderDetails?.businessId?.sId ?? "",
-          "userId": orderDetails?.userId?.sId ?? "",
-          "rating": rate.value.toString(),
-          if (comment.text.isNotEmpty) "comment": comment.text
-        },
+      final res = await ApiService.getApi(
+        Apis.getRatingByUIdBId(
+          bId: orderDetails!.businessId!.sId!,
+          uId: orderDetails!.userId!.sId!,
+        ),
       );
 
-      if (response != null) {
-        ShowToast.toast(
-          msg: response['message'] ?? "Rating submitted successfully.",
+      if (res != null && res['ratings'] is List && res['ratings'].isNotEmpty) {
+        final ratingData = res['ratings'][0];
+        rate.value = ratingData['rating']?.toDouble() ?? 0.0;
+        comment.text = ratingData['comment'] ?? "";
+        ratingId = ratingData['_id']; // ✅ store the rating ID
+        isRated.value = true;
+      }
+    } catch (e) {
+      ShowToast.errorSnackbar(title: "Error", msg: "$e");
+    } finally {
+      isRate.value = false;
+    }
+  }
+
+  void rateUs() async {
+    isRate.value = true;
+    try {
+      if (isRated.value) {
+        // update existing rating
+        final res = await ApiService.putApi(
+          Apis.updateRating(rId: ratingId!), // use stored rating ID
+          body: {
+            "rating": rate.value.toString(),
+            if (comment.text.isNotEmpty) "comment": comment.text
+          },
         );
+        if (res != null) {
+          ShowToast.toast(
+            msg: res['message'] ?? "Rating updated successfully.",
+          );
+        }
+      } else {
+        // create new rating
+        final response = await ApiService.postApi(
+          Apis.createRating,
+          body: {
+            "businessId": orderDetails?.businessId?.sId ?? "",
+            "userId": orderDetails?.userId?.sId ?? "",
+            "rating": rate.value.toString(),
+            if (comment.text.isNotEmpty) "comment": comment.text
+          },
+        );
+        if (response != null) {
+          ShowToast.toast(
+            msg: response['message'] ?? "Rating submitted successfully.",
+          );
+          isRated.value = true;
+        }
       }
     } catch (e) {
       ShowToast.errorSnackbar(title: "Error", msg: "$e");
