@@ -175,6 +175,7 @@ class AndroidBusinessDetailController extends GetxController {
         sId: details?.business?.sId ?? "",
         image: details?.business?.mainImage?.data?.data ?? [],
         ratting: "${ratting.value}",
+        category: details?.business?.category ?? "",
       ));
     }
 

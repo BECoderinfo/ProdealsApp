@@ -1,61 +1,63 @@
 import '../../imports.dart';
 
-import 'package:get/get.dart';
-
 class SearchControllers extends GetxController {
-  // Search input
-  var searchText = ''.obs;
+  final HomePageController homePageController = Get.find<HomePageController>();
 
-  // Selected category
-  var selectedCategory = ''.obs;
+  RxString searchQuery = "".obs;
+  RxString selectedCategory = ''.obs;
 
-  // Dummy data
-  final allItems = <Map<String, String>>[
-    {"name": "Butter Chicken", "category": "North Indian"},
-    {"name": "Margherita Pizza", "category": "Pizza"},
-    {"name": "Chocolate Shake", "category": "Shake"},
-    {"name": "Brownie", "category": "Desserts"},
-    {"name": "Dark Chocolate", "category": "Chocolate"},
-  ];
-
-  // Filtered result
-  RxList<Map<String, String>> filteredItems = <Map<String, String>>[].obs;
+  RxList<BusinessListModel> filteredBusinessList = <BusinessListModel>[].obs;
+  RxList<CategoryListModel> filteredCategoryList = <CategoryListModel>[].obs;
 
   @override
   void onInit() {
     super.onInit();
-    filterItems(); // Load initially
+    filteredBusinessList.assignAll(homePageController.businessList);
+    filteredCategoryList.assignAll(homePageController.categoryList);
+
+    debounce(searchQuery, (_) {
+      filterResults();
+    }, time: Duration(milliseconds: 300));
   }
 
   void updateSearch(String value) {
-    searchText.value = value;
-    filterItems();
+    searchQuery.value = value;
+  }
+
+  void clearSearch() {
+    searchQuery.value = '';
   }
 
   void selectCategory(String category) {
     selectedCategory.value = category;
-    filterItems();
-  }
-
-  void filterItems() {
-    final query = searchText.value.toLowerCase();
-    final category = selectedCategory.value;
-
-    filteredItems.value = allItems.where((item) {
-      final matchesCategory = category.isEmpty || item['category'] == category;
-      final matchesSearch =
-          query.isEmpty || item['name']!.toLowerCase().contains(query);
-      return matchesCategory && matchesSearch;
-    }).toList();
-  }
-
-  void clearSearch() {
-    searchText.value = '';
-    filterItems();
+    filterResults();
   }
 
   void clearCategory() {
     selectedCategory.value = '';
-    filterItems();
+    filterResults();
+  }
+
+  void filterResults() {
+    final query = searchQuery.value.toLowerCase();
+    final category = selectedCategory.value.toLowerCase();
+
+    List<BusinessListModel> businesses = homePageController.businessList;
+
+    if (query.isNotEmpty) {
+      businesses = businesses
+          .where((b) =>
+              (b.businessName?.toLowerCase().contains(query) ?? false) ||
+              (b.address?.toLowerCase().contains(query) ?? false))
+          .toList();
+    }
+
+    if (category.isNotEmpty) {
+      businesses = businesses
+          .where((b) => b.category?.toLowerCase() == category)
+          .toList();
+    }
+
+    filteredBusinessList.assignAll(businesses);
   }
 }

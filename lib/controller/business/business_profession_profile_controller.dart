@@ -71,6 +71,7 @@ class BusinessProfessionProfileController extends GetxController {
         "address": data['address'],
         "state": data['state'],
         "city": data['city'],
+        "landmark": data['landmark'],
         "pincode": data['pincode'],
         "category": data['category'],
         "gstNumber": data['gstNumber'],

@@ -30,16 +30,18 @@ class AndroidBusinessDetails extends GetView<AndroidBusinessDetailController> {
           ),
           actions: [
             Obx(
-              () => IconButton(
-                onPressed: () {
-                  controller.favouriteManage();
-                },
-                icon: Icon(
-                  controller.isFavourite.value
-                      ? Icons.favorite_rounded
-                      : Icons.favorite_outline_rounded,
-                ),
-              ),
+              () => controller.isLoaded.value
+                  ? IconButton(
+                      onPressed: () {
+                        controller.favouriteManage();
+                      },
+                      icon: Icon(
+                        controller.isFavourite.value
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_outline_rounded,
+                      ),
+                    )
+                  : Container(),
             ),
           ],
           backgroundColor: const Color(0xFFD6AA26),

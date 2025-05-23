@@ -274,6 +274,38 @@ Widget drawer(double hit, double wid) {
         GestureDetector(
           onTap: () {
             Get.back();
+            Get.offNamed('/Ratings')?.then(
+              (value) {
+                Get.delete<ManageOfferController>();
+              },
+            );
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'MANAGE RATINGS',
+                    style: GoogleFonts.openSans(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+        const Gap(20),
+        GestureDetector(
+          onTap: () {
+            Get.back();
             Get.toNamed('/order_dashboard');
           },
           child: Row(
@@ -531,7 +563,7 @@ Widget drawer(double hit, double wid) {
               key: UserStorageDataKeys.cPanel,
               data: "${panel.user}",
             );
-            currentPageIndex.value = 0;
+            currentPageIndex.value = AppPage.home;
             Navigator.popUntil(Get.context!, (route) => route.isFirst);
             Get.offNamed('/navigation');
           },

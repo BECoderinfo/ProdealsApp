@@ -5,46 +5,15 @@ class ManageBannerScreen extends GetView<ManageBannerController> {
 
   @override
   Widget build(BuildContext context) {
-    double hit = MediaQuery.of(context).size.height;
-    double wid = MediaQuery.of(context).size.width;
+    final Size size = MediaQuery.of(context).size;
     return GetBuilder<ManageBannerController>(
       init: ManageBannerController(),
       builder: (controller) {
         return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            actions: [
-              BusinessImage.mainStoreImageWidget(),
-              const Gap(16),
-            ],
-            elevation: 0,
-          ),
-          drawer: drawer(hit, wid),
-          floatingActionButton: Obx(
-            () => controller.isProcess.value && controller.bId.isEmpty
-                ? Gap(10)
-                : FloatingActionButton.extended(
-                    backgroundColor: AppColor.primary,
-                    onPressed: () {
-                      controller.selectedBanner.value = null;
-                      controller.selectedOffer.value = null;
-                      controller.selectedType.value = null;
-                      controller.showAddUpdateBannerDialog(
-                        ctx: context,
-                        title: "Request banner",
-                        wid: wid,
-                      );
-                    },
-                    label: Text(
-                      "Request banner",
-                      style: TextStyle(color: AppColor.white),
-                    ),
-                    icon: Icon(
-                      Icons.add_rounded,
-                      color: AppColor.white,
-                    ),
-                  ),
-          ),
+          appBar: _buildAppBar(),
+          drawer: drawer(size.height, size.width),
+          floatingActionButton:
+              _buildFloatingActionButton(controller, context, size.width),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Column(
@@ -247,8 +216,8 @@ class ManageBannerScreen extends GetView<ManageBannerController> {
                                                     controller.bannerList[index]
                                                         .image!.data!,
                                                   ),
-                                                  width: wid,
-                                                  height: wid * 0.35,
+                                                  width: size.width,
+                                                  height: size.width * 0.35,
                                                   fit: BoxFit.cover,
                                                 ),
                                               ),
@@ -410,7 +379,8 @@ class ManageBannerScreen extends GetView<ManageBannerController> {
                                                                   index: index,
                                                                   title:
                                                                       "Request banner",
-                                                                  wid: wid,
+                                                                  wid: size
+                                                                      .width,
                                                                 );
                                                               }
                                                             },
@@ -452,6 +422,44 @@ class ManageBannerScreen extends GetView<ManageBannerController> {
           ),
         );
       },
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      actions: [
+        BusinessImage.mainStoreImageWidget(),
+        const Gap(16),
+      ],
+      elevation: 0,
+    );
+  }
+
+  Widget _buildFloatingActionButton(
+      ManageBannerController controller, BuildContext context, double width) {
+    return Obx(
+      () => controller.isProcess.value && controller.bId.isEmpty
+          ? const SizedBox.shrink()
+          : FloatingActionButton.extended(
+              backgroundColor: AppColor.primary,
+              onPressed: () {
+                controller.resetSelection();
+                controller.showAddUpdateBannerDialog(
+                  ctx: context,
+                  title: "Request banner",
+                  wid: width,
+                );
+              },
+              label: Text(
+                "Request banner",
+                style: TextStyle(color: AppColor.white),
+              ),
+              icon: Icon(
+                Icons.add_rounded,
+                color: AppColor.white,
+              ),
+            ),
     );
   }
 }

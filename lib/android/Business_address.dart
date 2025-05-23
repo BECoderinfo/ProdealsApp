@@ -81,6 +81,21 @@ class B_Address extends GetView<BusinessAddressScreenController> {
                     },
                     hintText: "Address",
                   ),
+                  const Gap(20),
+                  Text(
+                    'Landmark',
+                    style: TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const Gap(10),
+                  My_TextFiled(
+                    controller: bAddressController.landmarkController,
+                    validator: (value) {
+                      return null;
+                    },
+                    hintText: "Landmark",
+                  ),
                   Obx(
                     () => Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

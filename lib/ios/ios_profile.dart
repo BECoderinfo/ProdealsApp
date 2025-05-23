@@ -515,6 +515,7 @@ class IosProfile extends GetView<ProfilePageController> {
                                           'SIGN OUT',
                                           style: GoogleFonts.openSans(
                                             fontWeight: FontWeight.bold,
+                                            color: AppColor.white,
                                           ),
                                         ),
                                       ],

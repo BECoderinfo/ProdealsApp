@@ -357,7 +357,7 @@ class CartController extends GetxController {
           ShowToast.toast(
             msg: response['message'] ?? "",
           );
-          currentPageIndex.value = 3;
+          currentPageIndex.value = AppPage.cart;
           pageController.jumpToPage(
             3,
           );

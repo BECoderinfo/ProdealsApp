@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:pro_deals1/imports.dart';
+import 'package:pro_deals1/ios/ios_search.dart';
 
 class ios_navigation extends StatefulWidget {
   const ios_navigation({super.key});
@@ -11,16 +12,18 @@ class ios_navigation extends StatefulWidget {
 class _IosNavigationState extends State<ios_navigation> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = const [
-    ios_home(),
-    ios_scan_qr(),
-    iosFavourite(),
-    IosProfile(),
+  final List<Widget> _pages = [
+    const ios_home(),
+    ios_cart(),
+    const ios_scan_qr(),
+    const iosFavourite(),
+    const IosProfile(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: (_currentIndex == 2) ? true : false,
       body: _pages[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -55,6 +58,10 @@ class _IosNavigationState extends State<ios_navigation> {
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(CupertinoIcons.cart),
                 label: '',
               ),
               BottomNavigationBarItem(

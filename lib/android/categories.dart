@@ -71,78 +71,86 @@ class categories extends StatelessWidget {
 
   // 🔧 This is the same method used on the Home Page
   Widget _buildCategoryCard(category, double hit, double wid, int index) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: 180, // Adjust this value as needed
-        maxWidth: wid / 3.3,
-      ),
-      child: Container(
-        height: hit / 4,
-        width: wid / 3.6,
-        decoration: BoxDecoration(
-          color: AppColor.white,
-          boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 1)],
-          borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(
+          '/category_detail_screen',
+          arguments: category.category ?? "",
+        );
+      },
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: 180, // Adjust this value as needed
+          maxWidth: wid / 3.3,
         ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Column(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      category.category ?? "",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.openSans(
-                        color:
-                            Colors.primaries[index % Colors.primaries.length],
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+        child: Container(
+          height: hit / 4,
+          width: wid / 3.6,
+          decoration: BoxDecoration(
+            color: AppColor.white,
+            boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 1)],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Column(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        category.category ?? "",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.openSans(
+                          color:
+                              Colors.primaries[index % Colors.primaries.length],
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(8),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: Image.memory(
-                        Uint8List.fromList(category.image!.data!),
-                        fit: BoxFit.cover,
+                  Expanded(
+                    flex: 3,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(8),
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Image.memory(
+                          Uint8List.fromList(category.image!.data!),
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Container(
-              height: (hit / 6) / 2.4,
-              width: wid / 3.6,
-              decoration: BoxDecoration(
-                color: Colors.primaries[index % Colors.primaries.length],
-                shape: BoxShape.circle,
+                ],
               ),
-            ),
-            Container(
-              height: (hit / 6) / 2.8,
-              width: wid / 3.6,
-              alignment: Alignment.center,
-              child: ClipOval(
-                child: Image.memory(
-                  Uint8List.fromList(category.icon!.data!),
-                  fit: BoxFit.cover,
+              Container(
+                height: (hit / 6) / 2.4,
+                width: wid / 3.6,
+                decoration: BoxDecoration(
+                  color: Colors.primaries[index % Colors.primaries.length],
+                  shape: BoxShape.circle,
                 ),
               ),
-            ),
-          ],
+              Container(
+                height: (hit / 6) / 2.8,
+                width: wid / 3.6,
+                alignment: Alignment.center,
+                child: ClipOval(
+                  child: Image.memory(
+                    Uint8List.fromList(category.icon!.data!),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

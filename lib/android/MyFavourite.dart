@@ -6,7 +6,7 @@ class Favourite extends GetView<FavouriteController> {
   @override
   Widget build(BuildContext context) {
     double hit = MediaQuery.of(context).size.height;
-    double wid = MediaQuery.of(context).size.width;
+
     return GetBuilder<FavouriteController>(
       init: FavouriteController(),
       builder: (controller) {
@@ -16,126 +16,149 @@ class Favourite extends GetView<FavouriteController> {
             centerTitle: true,
             backgroundColor: AppColor.primary,
           ),
-          body: Container(
-              padding: const EdgeInsets.all(16),
-              child: Obx(
-                () => controller.list.isEmpty
-                    ? Container(
-                        height: hit * 0.3,
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Business not found",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Obx(() {
+              if (controller.isError.value) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.search_off_rounded, size: 80),
+                      SizedBox(height: 16),
+                      Text(
+                        "Something went wrong. Please try again.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                         ),
-                      )
-                    : ListView.builder(
-                        itemCount: controller.list.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6.0),
-                            child: Card(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Get.toNamed('/and_restaurant_details',
-                                      arguments: {
-                                        'rId': controller.list[index].sId ?? "",
-                                      })?.then((e) {
-                                    controller.getAllFavouriteBusiness();
-                                    Get.delete<
-                                        AndroidBusinessDetailController>();
-                                  });
-                                },
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 75,
-                                      height: 75,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          bottomLeft: Radius.circular(10),
-                                        ),
-                                        child: Image.memory(
-                                          Uint8List.fromList(
-                                            controller.list[index].image,
-                                          ),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    Gap(10),
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            controller.list[index].name,
-                                          ),
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.location_city,
-                                                size: 14,
-                                                color: AppColor.gray,
-                                              ),
-                                              Gap(5),
-                                              Expanded(
-                                                child: Text(
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  "${controller.list[index].address}",
-                                                  style: TextStyle(
-                                                      color: AppColor.gray),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.star,
-                                                color: AppColor.primary,
-                                                size: 16,
-                                              ),
-                                              Text(
-                                                "${controller.list[index].ratting}",
-                                                style: TextStyle(
-                                                    color: AppColor.primary),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Gap(10),
-                                    IconButton(
-                                      icon: Icon(Icons.favorite_rounded),
-                                      onPressed: () {
-                                        controller.removeFavourite(
-                                          index: index,
-                                        );
-                                      },
-                                    )
-                                  ],
-                                ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              if (controller.isLoading.value) {
+                return ListView.builder(
+                  itemCount: 4,
+                  itemBuilder: (_, __) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6.0),
+                    child: Container(
+                      height: 90,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey[300],
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              if (controller.list.isEmpty) {
+                return Center(
+                  child: Text(
+                    "You Need to Add Favourite.",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                itemCount: controller.list.length,
+                itemBuilder: (context, index) {
+                  final business = controller.list[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Get.toNamed('/and_restaurant_details', arguments: {
+                        'rId': business.sId ?? "",
+                      })?.then((e) {
+                        controller.getAllFavouriteBusiness();
+                        Get.delete<AndroidBusinessDetailController>();
+                      });
+                    },
+                    child: Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: const Color(0xfff9f9f9),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColor.gray.withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(1, 1),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.memory(
+                                Uint8List.fromList(business.image!),
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
                               ),
                             ),
-                          );
-                        },
+                            const Gap(10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    business.name ?? "",
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    business.address ?? "",
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    "⭐ ${business.ratting?.toStringAsFixed(1) ?? "0.0"}",
+                                    style: TextStyle(
+                                      color: AppColor.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.favorite,
+                                color: Colors.redAccent,
+                              ),
+                              onPressed: () {
+                                controller.removeFavourite(index: index);
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-              )),
+                    ),
+                  );
+                },
+              );
+            }),
+          ),
         );
       },
     );
+  }
+}
+
+extension on String {
+  toStringAsFixed(int i) {
+    return double.parse(this).toStringAsFixed(i);
   }
 }

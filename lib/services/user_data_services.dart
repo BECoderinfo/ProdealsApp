@@ -22,6 +22,10 @@ class UserDataStorageServices {
   static dynamic checkIfExist({required String key}) {
     return MyVariables.box.hasData(key);
   }
+
+  static void clear() {
+    MyVariables.box.erase();
+  }
 }
 
 enum panel { business, user }
@@ -53,4 +57,8 @@ class UserStorageDataKeys {
   static const String businessName = "business_name";
   static const String businessAddress = "business_address";
   static const String businessTime = "business_time";
+
+  static const String businessRequestAccepted = "business_request_accepted";
+
+  static const String businessRequestSent = "business_request_sent";
 }

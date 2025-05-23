@@ -282,6 +282,38 @@ Widget C_drawer(double hit, double wid) {
             GestureDetector(
               onTap: () {
                 Get.back();
+                Get.offNamed('/Ratings')?.then(
+                  (value) {
+                    Get.delete<ManageOfferController>();
+                  },
+                );
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'MANAGE RATINGS',
+                        style: GoogleFonts.openSans(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+            const Gap(20),
+            GestureDetector(
+              onTap: () {
+                Get.back();
                 Get.toNamed('/order');
               },
               child: Row(
@@ -440,7 +472,7 @@ Widget C_drawer(double hit, double wid) {
             GestureDetector(
               onTap: () {
                 Get.back();
-                Get.toNamed('/ios_about_us', arguments: {
+                Get.toNamed('/About_Us', arguments: {
                   'fileName': MyVariables.aboutUsFile,
                 })?.then((value) {
                   Get.delete<SettingScreenController>();
@@ -472,7 +504,7 @@ Widget C_drawer(double hit, double wid) {
             GestureDetector(
               onTap: () {
                 Get.back();
-                Get.toNamed('/term_condition', arguments: {
+                Get.toNamed('/Term_condition', arguments: {
                   'fileName': MyVariables.tAndcFile,
                 })?.then((value) {
                   Get.delete<SettingScreenController>();
@@ -504,7 +536,7 @@ Widget C_drawer(double hit, double wid) {
             GestureDetector(
               onTap: () {
                 Get.back();
-                Get.toNamed('/privacy_policy', arguments: {
+                Get.toNamed('/Privacy_policy', arguments: {
                   'fileName': MyVariables.privacypolicyFile,
                 })?.then((value) {
                   Get.delete<SettingScreenController>();
@@ -539,7 +571,7 @@ Widget C_drawer(double hit, double wid) {
                   key: UserStorageDataKeys.cPanel,
                   data: "${panel.user}",
                 );
-                currentPageIndex.value = 0;
+                currentPageIndex.value = AppPage.home;
                 Navigator.popUntil(Get.context!, (route) => route.isFirst);
                 Get.offNamed('/navigation');
               },

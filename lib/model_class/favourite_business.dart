@@ -3,6 +3,7 @@ class FavouriteBusinessList {
   String? address;
   List<int>? image;
   String? sId;
+  String? category;
   String? ratting;
 
   FavouriteBusinessList({
@@ -10,6 +11,7 @@ class FavouriteBusinessList {
     this.address,
     this.image,
     this.sId,
+    this.category,
     this.ratting,
   });
 
@@ -18,6 +20,7 @@ class FavouriteBusinessList {
     address = json['address'];
     image = json['image'].cast<int>();
     sId = json['_id'];
+    category = json['category'];
     ratting = json['ratting'];
   }
 
@@ -27,6 +30,7 @@ class FavouriteBusinessList {
     data['address'] = this.address;
     data['image'] = this.image;
     data['_id'] = this.sId;
+    data['category'] = this.category;
     data['ratting'] = this.ratting;
     return data;
   }

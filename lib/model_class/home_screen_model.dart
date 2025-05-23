@@ -28,6 +28,7 @@ class BusinessListModel {
   String? state;
   String? city;
   String? pincode;
+  String? category;
   String? averageRating;
 
   BusinessListModel({
@@ -38,6 +39,7 @@ class BusinessListModel {
     this.state,
     this.city,
     this.pincode,
+    this.category,
     this.averageRating,
   });
 
@@ -51,6 +53,7 @@ class BusinessListModel {
     state = json['state'];
     city = json['city'];
     pincode = (json['pincode'] ?? "").toString();
+    category = json['category'];
     averageRating = (json['averageRating'] ?? 0).toString();
   }
 
@@ -65,6 +68,7 @@ class BusinessListModel {
     data['state'] = this.state;
     data['city'] = this.city;
     data['pincode'] = this.pincode;
+    data['category'] = this.category;
     data['averageRating'] = this.averageRating;
     return data;
   }

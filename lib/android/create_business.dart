@@ -115,12 +115,9 @@ class create_business extends GetView<CreateBusinessScreenController> {
                       const SizedBox(
                         height: 20,
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          'Full Name',
-                          style: TextStyle(color: AppColor.gray),
-                        ),
+                      Text(
+                        'Full Name',
+                        style: TextStyle(color: AppColor.gray),
                       ),
                       const Gap(10),
                       My_TextFiled(
@@ -156,12 +153,9 @@ class create_business extends GetView<CreateBusinessScreenController> {
                       // const SizedBox(
                       //   height: 20,
                       // ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          'Phone Number',
-                          style: TextStyle(color: Colors.grey),
-                        ),
+                      Text(
+                        'Phone Number',
+                        style: TextStyle(color: Colors.grey),
                       ),
                       const Gap(10),
                       My_TextFiled(

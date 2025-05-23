@@ -1,38 +1,48 @@
 import 'dart:developer';
-
 import 'package:pro_deals1/imports.dart';
 
 class FavouriteController extends GetxController {
   @override
   void onInit() {
-    // TODO: implement onInit
     super.onInit();
     getAllFavouriteBusiness();
   }
 
-  getAllFavouriteBusiness() {
-    final list1 = UserDataStorageServices.readData(
-      key: UserStorageDataKeys.favouriteBusiness,
-    );
+  RxBool isLoading = true.obs;
+  RxBool isError = false.obs;
+  RxList<FavouriteBusinessList> list = <FavouriteBusinessList>[].obs;
 
-    list.clear();
-    if (list1 != null) {
-      list.addAll(
-        List.from(list1).map((e) => FavouriteBusinessList.fromJson(e)),
+  void getAllFavouriteBusiness() {
+    try {
+      isError.value = false;
+      isLoading.value = true;
+
+      final list1 = UserDataStorageServices.readData(
+        key: UserStorageDataKeys.favouriteBusiness,
       );
+
+      list.clear();
+
+      if (list1 != null) {
+        list.addAll(
+          List.from(list1).map((e) => FavouriteBusinessList.fromJson(e)),
+        );
+      }
+    } catch (e, st) {
+      log("Favourite load error: $e", stackTrace: st);
+      isError.value = true;
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  RxList<dynamic> list = <dynamic>[].obs;
-
-  removeFavourite({
-    required int index,
-  }) {
+  void removeFavourite({required int index}) {
     list.removeAt(index);
+
     if (list.isNotEmpty) {
       UserDataStorageServices.writeData(
         key: UserStorageDataKeys.favouriteBusiness,
-        data: list,
+        data: list.map((e) => e.toJson()).toList(),
       );
     } else {
       UserDataStorageServices.removeData(

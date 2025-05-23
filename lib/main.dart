@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pro_deals1/android/QR.dart';
 import 'package:pro_deals1/android/map.dart';
@@ -10,11 +11,14 @@ import 'package:pro_deals1/ios/promocode_details.dart';
 import 'android/UserPlan.dart';
 import 'android/premium_detail_page.dart';
 import 'imports.dart';
+import 'ios/ios_search.dart';
 import 'ios/pages/overview.dart';
+import 'ios/pages/ratings_page.dart';
 import 'splash.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Make sure this is awaited
 
   await GetStorage.init();
 
@@ -45,7 +49,7 @@ class ProDeals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _iosApp();
+    // return _iosApp();
     if (Platform.isIOS) {
       return _iosApp();
     } else {
@@ -64,8 +68,8 @@ class ProDeals extends StatelessWidget {
       defaultTransition: Transition.cupertino,
       transitionDuration: Duration(milliseconds: 650),
       title: "Pro Deals",
-      // initialRoute: '/',
-      initialRoute: '/ios_business_address',
+      initialRoute: '/',
+      // initialRoute: '/ios_business_address',
       getPages: [
         GetPage(
           name: '/',
@@ -172,6 +176,10 @@ class ProDeals extends StatelessWidget {
           page: () => const ios_qr(),
         ),
         GetPage(
+          name: '/ios_search',
+          page: () => IosSearch(),
+        ),
+        GetPage(
           name: '/ios_scan_qr',
           page: () => const ios_scan_qr(),
         ),
@@ -220,15 +228,15 @@ class ProDeals extends StatelessWidget {
           page: () => const dashboard(),
         ),
         GetPage(
-          name: '/ios_about_us',
+          name: '/About_Us',
           page: () => const ios_about_us(),
         ),
         GetPage(
-          name: '/privacy_policy',
+          name: '/Privacy_policy',
           page: () => const privacy_policy(),
         ),
         GetPage(
-          name: '/term_condition',
+          name: '/Term_condition',
           page: () => const term_conditiom(),
         ),
         GetPage(
@@ -311,6 +319,10 @@ class ProDeals extends StatelessWidget {
           name: '/userPlan',
           page: () => const UserPlan(),
         ),
+        GetPage(
+          name: '/Ratings',
+          page: () => RatingsPage(),
+        ),
       ],
     );
   }
@@ -319,7 +331,6 @@ class ProDeals extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Pro Deals",
-      // initialRoute: '/PremiumDetails',
       initialRoute: '/',
       theme: ThemeData(useMaterial3: true),
       getPages: [
@@ -353,7 +364,7 @@ class ProDeals extends StatelessWidget {
         ),
         GetPage(
           name: '/navigation',
-          page: () => const navigation(),
+          page: () => const Navigation(),
         ),
         GetPage(
           name: '/home',
@@ -566,6 +577,10 @@ class ProDeals extends StatelessWidget {
         GetPage(
           name: '/userPlan',
           page: () => const UserPlan(),
+        ),
+        GetPage(
+          name: '/Ratings',
+          page: () => RatingsPage(),
         ),
       ],
     );

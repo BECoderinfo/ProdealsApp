@@ -16,11 +16,15 @@ class home_page extends GetView<HomePageController> {
         return Scaffold(
           appBar: AppBar(
             title: GestureDetector(
-              onTap: hController.openCityListSheet,
+              onTap: hController.cityList.isEmpty
+                  ? null
+                  : hController.openCityListSheet,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Obx(() => Text('${hController.cityName.value}')),
+                  Obx(() => hController.cityList.isEmpty
+                      ? Text('...')
+                      : Text('${hController.cityName.value}')),
                   Icon(Icons.keyboard_arrow_down),
                 ],
               ),
@@ -30,7 +34,10 @@ class home_page extends GetView<HomePageController> {
             actions: [
               IconButton(
                 icon: Icon(Icons.search),
-                onPressed: () => Get.toNamed('/Search'),
+                onPressed: () => hController.cityName.value.isEmpty
+                    ? null
+                    : Get.toNamed('/Search',
+                        arguments: hController.cityName.value),
               ),
             ],
           ),
@@ -38,7 +45,7 @@ class home_page extends GetView<HomePageController> {
           body: SingleChildScrollView(
             // ScrollView directly wraps the content
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildBannerSlider(hit, hController),
                 const Gap(10),
@@ -140,10 +147,26 @@ class home_page extends GetView<HomePageController> {
     return Obx(() {
       final isLoading = controller.categoryList.isEmpty;
       final categoriesToShow = isLoading
-          ? List.filled(6, null) // Show 6 shimmer cards as placeholder
+          ? List.filled(6, null)
           : controller.categoryList.length > 6
               ? controller.categoryList.sublist(0, 6)
               : controller.categoryList;
+
+      // Constants
+      const crossAxisCount = 3;
+      const mainAxisSpacing = 12.0;
+      const childAspectRatio = 0.8;
+
+      // Calculate child width based on screen width and spacing
+      final totalHorizontalPadding =
+          32.0 + (crossAxisCount - 1) * mainAxisSpacing;
+      final itemWidth = (wid - totalHorizontalPadding) / crossAxisCount;
+
+      // Calculate height of each child based on aspect ratio
+      final itemHeight = itemWidth / childAspectRatio;
+
+      // Total Grid height = (2 items * itemHeight) + spacing between rows
+      final gridHeight = (2 * itemHeight) + mainAxisSpacing;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,12 +198,12 @@ class home_page extends GetView<HomePageController> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: SizedBox(
-              height: hit / 3,
+              height: gridHeight,
               child: GridView.count(
-                crossAxisCount: 3,
-                mainAxisSpacing: 12,
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: mainAxisSpacing,
                 crossAxisSpacing: 12,
-                childAspectRatio: 0.8,
+                childAspectRatio: childAspectRatio,
                 physics: const NeverScrollableScrollPhysics(),
                 children: List.generate(categoriesToShow.length, (index) {
                   final category = categoriesToShow[index];
@@ -201,8 +224,8 @@ class home_page extends GetView<HomePageController> {
 
   Widget _buildCategoryPlaceholderCard(double hit, double wid) {
     return Container(
-      height: hit / 6,
-      width: wid / 3.6,
+      height: hit / 4.5, // Match same fixed height
+      width: wid / 3.3,
       decoration: BoxDecoration(
         color: Colors.grey[300],
         borderRadius: BorderRadius.circular(8),
@@ -218,79 +241,71 @@ class home_page extends GetView<HomePageController> {
           arguments: category.category ?? "",
         );
       },
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: 180, // Adjust this value as needed
-          maxWidth: wid / 3.3,
+      child: Container(
+        height: hit / 4.5, // Fixed height
+        width: wid / 3.3, // Optional: keep consistent width
+        decoration: BoxDecoration(
+          color: AppColor.white,
+          boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 1)],
+          borderRadius: BorderRadius.circular(8),
         ),
-        child: Container(
-          height: hit / 6,
-          width: wid / 3.6,
-          decoration: BoxDecoration(
-            color: AppColor.white,
-            boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 1)],
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Column(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        category.category ?? "",
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.openSans(
-                          color:
-                              Colors.primaries[index % Colors.primaries.length],
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Column(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      category.category ?? "",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.openSans(
+                        color:
+                            Colors.primaries[index % Colors.primaries.length],
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  Expanded(
-                    flex: 3,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.vertical(
-                        bottom: Radius.circular(8),
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        child: Image.memory(
-                          Uint8List.fromList(category.image!.data!),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(8),
+                    ),
+                    child: Image.memory(
+                      Uint8List.fromList(category.image!.data!),
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
                     ),
                   ),
-                ],
+                ),
+              ],
+            ),
+            Container(
+              height: (hit / 6) / 3.4,
+              width: wid / 3.6,
+              decoration: BoxDecoration(
+                color: Colors.primaries[index % Colors.primaries.length],
+                shape: BoxShape.circle,
               ),
-              Container(
-                height: (hit / 6) / 3.4,
-                width: wid / 3.6,
-                decoration: BoxDecoration(
-                  color: Colors.primaries[index % Colors.primaries.length],
-                  shape: BoxShape.circle,
+            ),
+            Container(
+              height: (hit / 6) / 3.9,
+              width: wid / 3.6,
+              alignment: Alignment.center,
+              child: ClipOval(
+                child: Image.memory(
+                  Uint8List.fromList(category.icon!.data!),
+                  fit: BoxFit.cover,
                 ),
               ),
-              Container(
-                height: (hit / 6) / 3.9,
-                width: wid / 3.6,
-                alignment: Alignment.center,
-                child: ClipOval(
-                  child: Image.memory(
-                    Uint8List.fromList(category.icon!.data!),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -402,17 +417,18 @@ class home_page extends GetView<HomePageController> {
             'Popular Businesses',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          GestureDetector(
-            onTap: () => Get.toNamed('/Categories'),
-            child: Text(
-              'See All',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: AppColor.primary,
-              ),
-            ),
-          ),
+          Gap(0),
+          // GestureDetector(
+          //   onTap: () => Get.toNamed('/Categories'),
+          //   child: Text(
+          //     'See All',
+          //     style: TextStyle(
+          //       fontSize: 14,
+          //       fontWeight: FontWeight.bold,
+          //       color: AppColor.primary,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

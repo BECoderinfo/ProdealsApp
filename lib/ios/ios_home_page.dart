@@ -49,11 +49,15 @@ class ios_home extends GetView<HomePageController> {
             ),
             centerTitle: true,
             actions: [
-              GestureDetector(
-                onTap: () {
-                  Get.toNamed('/ios_cart');
-                },
-                child: Icon(CupertinoIcons.cart),
+              Obx(
+                () => GestureDetector(
+                  onTap: hController.cityList.isEmpty
+                      ? null
+                      : () {
+                          Get.toNamed('/ios_search');
+                        },
+                  child: Icon(CupertinoIcons.search),
+                ),
               ),
               Gap(20),
               Container(

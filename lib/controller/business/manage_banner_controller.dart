@@ -1,4 +1,5 @@
 import 'package:pro_deals1/imports.dart';
+import 'package:image/image.dart' as img;
 
 class ManageBannerController extends GetxController {
   @override
@@ -14,6 +15,12 @@ class ManageBannerController extends GetxController {
   }
 
   RxList<OfferListModel> offerList = <OfferListModel>[].obs;
+
+  void resetSelection() {
+    selectedBanner.value = null;
+    selectedOffer.value = null;
+    selectedType.value = null;
+  }
 
   getAllOffer({required String bId}) async {
     try {
@@ -40,29 +47,29 @@ class ManageBannerController extends GetxController {
 
   String getBannerTypeName({required String type}) {
     if (type == "1") {
-      return "Upper slider banner";
+      return "Top slider banner";
     } else if (type == "2") {
-      return "Middle slider banner";
+      return "Offers banner";
     } else if (type == "3") {
-      return "Lower slider banner";
+      return "Middle slider banner";
     }
     return "";
   }
 
   List<String> typeList = [
-    'Upper slider banner',
-    'Middle slider banner',
-    'Lower slider banner'
+    'Top slider banner',
+    'Offers banner',
+    'Middle slider banner'
   ];
 
   Rxn<String?> selectedType = Rxn<String?>();
 
   String getBannerTypeString({required String type}) {
-    if (type == "Upper slider banner") {
+    if (type == "Top slider banner") {
       return "1";
-    } else if (type == "Middle slider banner") {
+    } else if (type == "Offers banner") {
       return "2";
-    } else if (type == "Lower slider banner") {
+    } else if (type == "Middle slider banner") {
       return "3";
     }
     return "";
@@ -211,22 +218,56 @@ class ManageBannerController extends GetxController {
     );
   }
 
-  Future<void> _pickImageFromGallery() async {
-    final imagePicker = ImagePicker();
-    final pickedImage =
-        await imagePicker.pickImage(source: ImageSource.gallery);
+  void _pickImageFromGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedImage == null) return;
+    if (pickedFile != null) {
+      final file = File(pickedFile.path);
+      final imageBytes = await file.readAsBytes();
+      final decodedImage = img.decodeImage(imageBytes);
 
-    selectedBanner.value = File(pickedImage.path);
+      if (decodedImage == null) {
+        ShowToast.toast(msg: "Invalid image format.");
+        return;
+      }
+
+      final width = decodedImage.width;
+      final height = decodedImage.height;
+
+      if (height >= width) {
+        ShowToast.toast(msg: "Please select a Horizontal (poster) image.");
+        return;
+      }
+
+      selectedBanner.value = file;
+    }
   }
 
-  Future<void> _pickImageFromCamera() async {
-    final imagePicker = ImagePicker();
-    final pickedImage = await imagePicker.pickImage(source: ImageSource.camera);
+  void _pickImageFromCamera() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
-    if (pickedImage == null) return;
-    selectedBanner.value = File(pickedImage.path);
+    if (pickedFile != null) {
+      final file = File(pickedFile.path);
+      final imageBytes = await file.readAsBytes();
+      final decodedImage = img.decodeImage(imageBytes);
+
+      if (decodedImage == null) {
+        ShowToast.toast(msg: "Invalid image format.");
+        return;
+      }
+
+      final width = decodedImage.width;
+      final height = decodedImage.height;
+
+      if (height >= width) {
+        ShowToast.toast(msg: "Please capture a Horizontal (poster) image.");
+        return;
+      }
+
+      selectedBanner.value = file;
+    }
   }
 
   requestBanner() async {

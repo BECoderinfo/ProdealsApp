@@ -48,7 +48,6 @@ class register extends GetView<RegisterController> {
                         'Please Register to Login.',
                         style: GoogleFonts.roboto(
                           fontSize: 16,
-                          // fontWeight: FontWeight.bold,
                           color: AppColor.white,
                         ),
                       ),
@@ -67,10 +66,7 @@ class register extends GetView<RegisterController> {
                               shape: BoxShape.circle,
                             ),
                             alignment: Alignment.center,
-                            child: Icon(
-                              Icons.person,
-                              size: 20,
-                            ),
+                            child: Icon(Icons.person, size: 20),
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -99,10 +95,7 @@ class register extends GetView<RegisterController> {
                               shape: BoxShape.circle,
                             ),
                             alignment: Alignment.center,
-                            child: Icon(
-                              Icons.call,
-                              size: 20,
-                            ),
+                            child: Icon(Icons.call, size: 20),
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -133,17 +126,14 @@ class register extends GetView<RegisterController> {
                               shape: BoxShape.circle,
                             ),
                             alignment: Alignment.center,
-                            child: Icon(
-                              Icons.email,
-                              size: 20,
-                            ),
+                            child: Icon(Icons.email, size: 20),
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                           hintText: 'Enter email',
                         ),
-                        validator: (num) {
+                        validator: (email) {
                           if (controller.email.text.isEmpty) {
                             return 'Enter email';
                           } else if (!GetUtils.isEmail(controller.email.text)) {
@@ -156,35 +146,46 @@ class register extends GetView<RegisterController> {
                     const Gap(14),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: TextFormField(
-                        controller: controller.password,
-                        decoration: InputDecoration(
-                          label: Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                              color: AppColor.white,
-                              shape: BoxShape.circle,
+                      child: Obx(
+                        () => TextFormField(
+                          controller: controller.password,
+                          obscureText: controller.isPasswordHidden.value,
+                          decoration: InputDecoration(
+                            label: Container(
+                              height: 30,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                color: AppColor.white,
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: Alignment.center,
+                              child: Icon(Icons.lock, size: 20),
                             ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.lock,
-                              size: 20,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                controller.isPasswordHidden.value
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                              onPressed: () {
+                                controller.isPasswordHidden.value =
+                                    !controller.isPasswordHidden.value;
+                              },
                             ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            hintText: 'Password',
                           ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          hintText: 'Password',
+                          validator: (pass) {
+                            if (controller.password.text.isEmpty) {
+                              return 'Enter password';
+                            } else if (controller.password.text.length < 8) {
+                              return 'Password must be at least 8 characters';
+                            }
+                            return null;
+                          },
                         ),
-                        validator: (pass) {
-                          if (controller.password.text.isEmpty) {
-                            return 'Enter password';
-                          } else if (controller.password.text.length < 8) {
-                            return 'password length must be 8 or 8+';
-                          }
-                          return null;
-                        },
                       ),
                     ),
                     const Gap(20),
@@ -192,23 +193,18 @@ class register extends GetView<RegisterController> {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Obx(
                         () => controller.isProcess.value
-                            ? CustomCircularIndicator(
-                                color: AppColor.white,
-                              )
+                            ? CustomCircularIndicator(color: AppColor.white)
                             : GestureDetector(
                                 onTap: () async {
                                   FocusScope.of(context).unfocus();
-                                  // controller.isProcess.value = false;
-                                  // return;
                                   var key = controller.formKey.currentState;
                                   if (key!.validate()) {
                                     controller.isProcess.value = true;
                                     await registerUser(
-                                      userName: controller.user.text.toString(),
-                                      email: controller.email.text.toString(),
-                                      phone: controller.phone.text.toString(),
-                                      password:
-                                          controller.password.text.toString(),
+                                      userName: controller.user.text.trim(),
+                                      email: controller.email.text.trim(),
+                                      phone: controller.phone.text.trim(),
+                                      password: controller.password.text.trim(),
                                       onDone: () {
                                         controller.isProcess.value = false;
                                       },
@@ -246,32 +242,44 @@ class register extends GetView<RegisterController> {
                 ),
               ),
             ),
+            const Gap(30),
             Text('Or Login With'),
-            const Gap(50),
+            const Gap(30),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Container(
-                height: 50,
-                width: width,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColor.primary,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 2,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(google),
-                    const Gap(6),
-                    Text('Continue With Google'),
-                  ],
+              child: GestureDetector(
+                onTap: () async {
+                  controller.isProcess.value = true;
+                  final result = await controller.signInWithGoogle();
+                  controller.isProcess.value = false;
+                  if (result != null) {
+                    // Navigate to home or handle as needed
+                    Get.snackbar('Success', 'Signed in with Google!');
+                  }
+                },
+                child: Container(
+                  height: 50,
+                  width: width,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColor.primary,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 2,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(google),
+                      const Gap(6),
+                      Text('Continue With Google'),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -284,7 +292,7 @@ class register extends GetView<RegisterController> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'already have an account?',
+                    'Already have an account?',
                     style: GoogleFonts.roboto(color: Colors.grey),
                   ),
                   const Gap(6),

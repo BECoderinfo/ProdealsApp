@@ -200,6 +200,7 @@ class BusinessProfessionDetailController extends GetxController {
             "address": data['address'],
             "state": data['state'],
             "city": data['city'],
+            "landmark": data['landmark'],
             "pincode": data['pincode'],
             "mainImage": data['mainImage'],
             "category": selectedValue.value ?? "",

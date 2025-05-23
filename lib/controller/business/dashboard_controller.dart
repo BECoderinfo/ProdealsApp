@@ -65,12 +65,11 @@ class BusinessDashboardController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getBusinessDashboardData(
-      bId: UserDataStorageServices.readData(
-            key: UserStorageDataKeys.businessId,
-          ) ??
-          "",
-    );
+    String bId =
+        UserDataStorageServices.readData(key: UserStorageDataKeys.businessId) ??
+            "";
+    getBusinessDashboardData(bId: bId);
+    getAverageRating(bId: bId);
     title.value = titleList.first;
   }
 
@@ -183,6 +182,27 @@ class BusinessDashboardController extends GetxController {
 
   int getNearestLowerMultipleOf(int value, int multiple) {
     return (value ~/ getInt(multiple)) * getInt(multiple);
+  }
+
+  getAverageRating({required String bId}) async {
+    try {
+      var response = await ApiService.getApi(Apis.businessRatting(bId: bId));
+      if (response != null) {
+        print("R :: ${response}");
+        UserDataStorageServices.writeData(
+          key: UserStorageDataKeys.businessRatting,
+          data: "${response['averageRating'] ?? "0"}",
+        );
+      } else {
+        isError.value = true;
+      }
+    } catch (error) {
+      isError.value = true;
+      ShowToast.errorSnackbar(
+        title: "Error",
+        msg: "$error",
+      );
+    }
   }
 
   int getInt(multiple) {

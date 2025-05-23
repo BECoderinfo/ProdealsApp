@@ -400,10 +400,31 @@ Widget drawer1(double hit, double wid) {
             : const Gap(10),
         GestureDetector(
           onTap: () {
-            MyVariables.box.erase().then(
-              (value) {
-                Get.offNamedUntil('/login', (route) => false);
-              },
+            // Show confirmation dialog before sign out
+            Get.defaultDialog(
+              title: "Are you sure?",
+              middleText: "Do you really want to sign out?",
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    // If user cancels, close the dialog
+                    Get.back();
+                  },
+                  child: Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Perform sign-out action
+                    MyVariables.box.erase().then((value) {
+                      Get.offNamedUntil(
+                        '/login',
+                        (route) => route.isFirst,
+                      );
+                    });
+                  },
+                  child: Text("Sign Out"),
+                ),
+              ],
             );
           },
           child: Center(

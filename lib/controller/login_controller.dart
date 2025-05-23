@@ -130,7 +130,7 @@ class LoginController extends GetxController {
       UserDataStorageServices.writeData(
           key: UserStorageDataKeys.cPanel, data: "${panel.user}");
       Navigator.popUntil(Get.context!, (route) => route.isFirst);
-      currentPageIndex.value = 0;
+      currentPageIndex.value = AppPage.home;
       Get.offNamed('/navigation');
     } else {
       bool b = await getBusinessById(bId: userdata['data']['businessId'] ?? "");
@@ -147,7 +147,7 @@ class LoginController extends GetxController {
         UserDataStorageServices.writeData(
             key: UserStorageDataKeys.cPanel, data: "${panel.user}");
         Navigator.popUntil(Get.context!, (route) => route.isFirst);
-        currentPageIndex.value = 0;
+        currentPageIndex.value = AppPage.home;
         Get.offNamed('/navigation');
       }
     }

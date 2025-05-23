@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:pro_deals1/imports.dart';
 import '../widget/ios/offerCard.dart';
@@ -173,51 +175,61 @@ class RestaurantDetails extends GetView<AndroidBusinessDetailController> {
                                           )
                                         : Expanded(
                                             child: ListView.builder(
+                                              padding: EdgeInsets.all(0),
                                               shrinkWrap: true,
                                               itemBuilder: (context, index) {
                                                 return buildOfferCard(
-                                                    title: detailController
-                                                        .calculateTimeDifference(
-                                                            createdDateStr: detailController
-                                                                    .offerList[
-                                                                        index]
-                                                                    .createdAt ??
-                                                                "${DateTime.now()}"),
-                                                    offer:
-                                                        "${detailController.offerList[index].offerPrice ?? 0}${detailController.offerList[index].offertype == "Amount" ? '₹' : '%'} off",
-                                                    description:
-                                                        "${detailController.offerList[index].description ?? ""}",
-                                                    discountPrice:
-                                                        "₹ ${detailController.offerList[index].paymentAmount ?? ""}/-",
-                                                    originalPrice:
-                                                        "₹ ${detailController.offerList[index].productPrice ?? ""}/-",
-                                                    validity:
-                                                        "${detailController.offerList[index].validOn ?? ""}",
-                                                    timings:
-                                                        "${detailController.details?.business?.openTime ?? ""}-${detailController.details?.business?.closeTime ?? ""}",
-                                                    button: Obx(
-                                                      () => (detailController
-                                                                  .deleteCartId
-                                                                  .isNotEmpty &&
-                                                              (detailController
+                                                  title: detailController
+                                                      .calculateTimeDifference(
+                                                          createdDateStr:
+                                                              detailController
                                                                       .offerList[
                                                                           index]
-                                                                      .sId ==
-                                                                  detailController
-                                                                      .deleteCartId
-                                                                      .value))
-                                                          ? CustomCircularIndicator(
-                                                              color: AppColor
-                                                                  .primary)
-                                                          : detailController
-                                                                  .getButtonName(
-                                                              offerId:
-                                                                  detailController
-                                                                          .offerList[
-                                                                      index],
-                                                            )
-                                                              ? GestureDetector(
-                                                                  onTap: () {
+                                                                      .createdAt ??
+                                                                  "${DateTime.now()}"),
+                                                  offer:
+                                                      "${detailController.offerList[index].offerPrice ?? 0}${detailController.offerList[index].offertype == "Amount" ? '₹' : '%'} off",
+                                                  description:
+                                                      "${detailController.offerList[index].description ?? ""}",
+                                                  discountPrice:
+                                                      "₹ ${detailController.offerList[index].paymentAmount ?? ""}/-",
+                                                  originalPrice:
+                                                      "₹ ${detailController.offerList[index].productPrice ?? ""}/-",
+                                                  validity:
+                                                      "${detailController.offerList[index].validOn ?? ""}",
+                                                  timings:
+                                                      "${detailController.details?.business?.openTime ?? ""}-${detailController.details?.business?.closeTime ?? ""}",
+                                                  button: Obx(
+                                                    () => (detailController
+                                                                .deleteCartId
+                                                                .isNotEmpty &&
+                                                            (detailController
+                                                                    .offerList[
+                                                                        index]
+                                                                    .sId ==
+                                                                detailController
+                                                                    .deleteCartId
+                                                                    .value))
+                                                        ? CustomCircularIndicator(
+                                                            color: AppColor
+                                                                .primary)
+                                                        : detailController
+                                                                .getButtonName(
+                                                            offerId:
+                                                                detailController
+                                                                        .offerList[
+                                                                    index],
+                                                          )
+                                                            ? GestureDetector(
+                                                                onTap: () {
+                                                                  log(UserDataStorageServices.readData(
+                                                                          key: UserStorageDataKeys
+                                                                              .isPremium)
+                                                                      .toString());
+                                                                  if (UserDataStorageServices.readData(
+                                                                          key: UserStorageDataKeys
+                                                                              .isPremium) ==
+                                                                      true) {
                                                                     detailController
                                                                         .addToCartItem(
                                                                       oId: detailController
@@ -225,80 +237,177 @@ class RestaurantDetails extends GetView<AndroidBusinessDetailController> {
                                                                               .sId ??
                                                                           "",
                                                                     );
-                                                                  },
-                                                                  child:
-                                                                      Container(
-                                                                    padding: EdgeInsets.symmetric(
-                                                                        horizontal:
-                                                                            10,
-                                                                        vertical:
-                                                                            5),
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      border:
-                                                                          Border
-                                                                              .all(
-                                                                        color: Colors
-                                                                            .green,
-                                                                        width:
-                                                                            1,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              10),
-                                                                    ),
-                                                                    child: Text(
-                                                                      "Add offer",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.w700,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                )
-                                                              : GestureDetector(
-                                                                  onTap: () {
-                                                                    detailController
-                                                                        .deleteItem(
-                                                                      oId: detailController
-                                                                              .offerList[index]
-                                                                              .sId ??
-                                                                          "",
+                                                                  } else {
+                                                                    showDialog(
+                                                                      context:
+                                                                          context,
+                                                                      builder:
+                                                                          (context) {
+                                                                        return Dialog(
+                                                                          shape:
+                                                                              RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(16),
+                                                                          ),
+                                                                          child:
+                                                                              Container(
+                                                                            padding:
+                                                                                const EdgeInsets.all(20),
+                                                                            width:
+                                                                                MediaQuery.of(context).size.width * 0.8,
+                                                                            child:
+                                                                                Column(
+                                                                              mainAxisSize: MainAxisSize.min,
+                                                                              children: [
+                                                                                Align(
+                                                                                  alignment: Alignment.topRight,
+                                                                                  child: InkWell(
+                                                                                    onTap: () => Navigator.pop(context),
+                                                                                    child: Icon(Icons.close, size: 20),
+                                                                                  ),
+                                                                                ),
+                                                                                Text(
+                                                                                  "UPGRADE TO PREMIUM!",
+                                                                                  style: TextStyle(
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    fontSize: 18,
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 10),
+                                                                                Text(
+                                                                                  "It is a long established fact that a reader will be distracted by the readable content of a page...",
+                                                                                  style: TextStyle(color: Colors.grey[700]),
+                                                                                  textAlign: TextAlign.center,
+                                                                                ),
+                                                                                SizedBox(height: 20),
+                                                                                Align(
+                                                                                  alignment: Alignment.centerLeft,
+                                                                                  child: Column(
+                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                    children: [
+                                                                                      Text("Premium Benefits:", style: TextStyle(fontWeight: FontWeight.bold)),
+                                                                                      SizedBox(height: 8),
+                                                                                      Text("• Access to all premium content"),
+                                                                                      Text("• Ad-free browsing experience"),
+                                                                                      Text("• Exclusive early access to new features"),
+                                                                                      Text("• Priority customer support"),
+                                                                                    ],
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 20),
+                                                                                ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(
+                                                                                    minimumSize: Size(double.infinity, 48),
+                                                                                    backgroundColor: Colors.amber,
+                                                                                    foregroundColor: Colors.black,
+                                                                                    shape: RoundedRectangleBorder(
+                                                                                      borderRadius: BorderRadius.circular(8),
+                                                                                    ),
+                                                                                  ),
+                                                                                  onPressed: () {
+                                                                                    Get.back();
+                                                                                    Get.toNamed("/Premium");
+                                                                                    // Trigger upgrade logic
+                                                                                  },
+                                                                                  child: Text("Upgrade Now"),
+                                                                                ),
+                                                                                SizedBox(height: 10),
+                                                                                OutlinedButton(
+                                                                                  style: OutlinedButton.styleFrom(
+                                                                                    minimumSize: Size(double.infinity, 48),
+                                                                                    side: BorderSide(color: Colors.amber),
+                                                                                    foregroundColor: Colors.black,
+                                                                                    shape: RoundedRectangleBorder(
+                                                                                      borderRadius: BorderRadius.circular(8),
+                                                                                    ),
+                                                                                  ),
+                                                                                  onPressed: () => Navigator.pop(context),
+                                                                                  child: Text("Close"),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      },
                                                                     );
-                                                                  },
-                                                                  child:
-                                                                      Container(
-                                                                    padding: EdgeInsets.symmetric(
-                                                                        horizontal:
-                                                                            10,
-                                                                        vertical:
-                                                                            5),
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      border:
-                                                                          Border
-                                                                              .all(
-                                                                        color: AppColor
-                                                                            .red,
-                                                                        width:
-                                                                            1,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              10),
+                                                                  }
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  padding: EdgeInsets
+                                                                      .symmetric(
+                                                                          horizontal:
+                                                                              10,
+                                                                          vertical:
+                                                                              5),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    border:
+                                                                        Border
+                                                                            .all(
+                                                                      color: Colors
+                                                                          .green,
+                                                                      width: 1,
                                                                     ),
-                                                                    child: Text(
-                                                                      "Remove offer",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.w700,
-                                                                      ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                  ),
+                                                                  child: Text(
+                                                                    "Add to cart",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w700,
                                                                     ),
                                                                   ),
                                                                 ),
-                                                    ));
+                                                              )
+                                                            : GestureDetector(
+                                                                onTap: () {
+                                                                  detailController
+                                                                      .deleteItem(
+                                                                    oId: detailController
+                                                                            .offerList[index]
+                                                                            .sId ??
+                                                                        "",
+                                                                  );
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  padding: EdgeInsets
+                                                                      .symmetric(
+                                                                          horizontal:
+                                                                              10,
+                                                                          vertical:
+                                                                              5),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    border:
+                                                                        Border
+                                                                            .all(
+                                                                      color: AppColor
+                                                                          .red,
+                                                                      width: 1,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                  ),
+                                                                  child: Text(
+                                                                    "Remove from cart",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w700,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                  ),
+                                                );
                                               },
                                               itemCount: detailController
                                                   .offerList.length,
@@ -587,15 +696,19 @@ class RestaurantDetails extends GetView<AndroidBusinessDetailController> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      // Get.toNamed('/locationios');
-                    },
-                    child: detailController.buildInfoCard(
-                      height,
-                      width,
-                      Icons.favorite_border,
-                      'Like',
+                  Obx(
+                    () => GestureDetector(
+                      onTap: () {
+                        controller.favouriteManage();
+                      },
+                      child: detailController.buildInfoCard(
+                        height,
+                        width,
+                        controller.isFavourite.value
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        'Like',
+                      ),
                     ),
                   ),
                   detailController.buildInfoCard(

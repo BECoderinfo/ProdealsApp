@@ -1,5 +1,7 @@
 import 'package:pro_deals1/imports.dart';
 
+import '../widget/shimmerLoding.dart';
+
 class CategoryDetailScreen extends GetView<CategoryDetailController> {
   const CategoryDetailScreen({super.key});
 
@@ -24,149 +26,158 @@ class CategoryDetailScreen extends GetView<CategoryDetailController> {
           ),
           body: Padding(
             padding: EdgeInsets.all(16),
-            child: Obx(
-              () => controller.isError.value
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.search_off_rounded,
-                          size: 80,
-                        ),
-                        Gap(20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                "Something went wrong please try again.",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w700),
+            child: Obx(() {
+              if (controller.isError.value) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.search_off_rounded, size: 80),
+                    const Gap(20),
+                    const Text(
+                      "Something went wrong please try again.",
+                      textAlign: TextAlign.center,
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                );
+              }
+
+              final isLoading = !controller.isLoaded.value;
+              final isEmpty = controller.businessList.isEmpty;
+
+              if (!isLoading && isEmpty) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Align(
+                      child: Text(
+                        "Business not found.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              final itemCount = isLoading ? 4 : controller.businessList.length;
+              return ListView.separated(
+                itemCount: itemCount,
+                separatorBuilder: (context, index) => const Gap(10),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final business =
+                      isLoading ? null : controller.businessList[index];
+
+                  return ShimmerLoading(
+                    isLoading: isLoading,
+                    child: business == null
+                        ? _buildBusinessPlaceholderCard()
+                        : GestureDetector(
+                            onTap: () {
+                              Get.toNamed('/and_restaurant_details',
+                                  arguments: {
+                                    'rId': business.sId ?? "",
+                                  })?.then((_) => Get.delete<
+                                  AndroidBusinessDetailController>());
+                            },
+                            child: Container(
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: const Color(0xfff9f9f9),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColor.gray,
+                                    blurRadius: 2,
+                                    offset: const Offset(0.5, 0.5),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )
-                  : controller.isLoaded.value
-                      ? controller.businessList.isEmpty
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
                                   children: [
-                                    Text(
-                                      "Business not found.",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w700),
+                                    if (business.mainImage?.data?.data != null)
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.memory(
+                                          Uint8List.fromList(
+                                              business.mainImage!.data!.data!),
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    else
+                                      Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[300],
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    const Gap(10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Text(
+                                            business.businessName ?? "",
+                                            style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            "${business.address ?? ""}, ${business.city ?? ""}",
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            "⭐ ${business.averageRating?.toStringAsFixed(1) ?? "0.0"}",
+                                            style: TextStyle(
+                                              color: AppColor.primary,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ],
-                            )
-                          : ListView.builder(
-                              itemCount: controller.businessList.length,
-                              padding: EdgeInsets.symmetric(vertical: 8),
-                              itemBuilder: (context, index) {
-                                return InkWell(
-                                  onTap: () {
-                                    Get.toNamed('/and_restaurant_details',
-                                        arguments: {
-                                          'rId': controller
-                                                  .businessList[index].sId ??
-                                              "",
-                                        })?.then((e) {
-                                      Get.delete<
-                                          AndroidBusinessDetailController>();
-                                    });
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.only(
-                                      bottom: 10,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: AppColor.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppColor.gray,
-                                          blurRadius: 2,
-                                          offset: const Offset(1, 1),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        controller.businessList[index].mainImage
-                                                    ?.data?.data ==
-                                                null
-                                            ? Gap(0)
-                                            : ClipRRect(
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(10),
-                                                  bottomLeft:
-                                                      Radius.circular(10),
-                                                ),
-                                                child: Image.memory(
-                                                  Uint8List.fromList(
-                                                    controller
-                                                        .businessList[index]
-                                                        .mainImage!
-                                                        .data!
-                                                        .data!,
-                                                  ),
-                                                  width: 85,
-                                                  height: 85,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                        Gap(10),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 10,
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "${controller.businessList[index].businessName ?? ""}",
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                                Gap(5),
-                                                Text(
-                                                  "${controller.businessList[index].address ?? ""}, ${controller.businessList[index].city ?? ""}, ${controller.businessList[index].state ?? ""}-${controller.businessList[index].pincode ?? ""}",
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            )
-                      : CustomCircularIndicator(
-                          color: AppColor.primary,
-                        ),
-            ),
+                              ),
+                            ),
+                          ),
+                  );
+                },
+              );
+            }),
           ),
         );
       },
     );
+  }
+
+  Widget _buildBusinessPlaceholderCard() {
+    return Container(
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
+  }
+}
+
+extension on String {
+  toStringAsFixed(int i) {
+    return double.parse(this).toStringAsFixed(i);
   }
 }

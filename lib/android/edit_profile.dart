@@ -125,90 +125,100 @@ class EditProfile extends GetView<EditProfileController> {
                       ),
                     ),
                     const Gap(30),
-                    TextFormField(
-                      controller: editProfileController.nameController,
-                      validator: (username) {
-                        if (editProfileController.nameController.text.isEmpty) {
-                          return 'Enter username';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Name',
-                        hintText: 'Enter your Name',
-                        prefixIcon: Icon(Icons.person),
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.transparent),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue),
-                          borderRadius: BorderRadius.circular(10.0),
+                    SizedBox(
+                      height: 60,
+                      child: TextFormField(
+                        controller: editProfileController.nameController,
+                        validator: (username) {
+                          if (editProfileController
+                              .nameController.text.isEmpty) {
+                            return 'Enter username';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Name',
+                          hintText: 'Enter your Name',
+                          prefixIcon: Icon(Icons.person),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.transparent),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.blue),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
                         ),
                       ),
                     ),
                     const Gap(20),
-                    TextFormField(
-                      controller: editProfileController.phoneController,
-                      validator: (num) {
-                        if (editProfileController
-                            .phoneController.text.isEmpty) {
-                          return 'Enter number';
-                        } else if (editProfileController
-                                .phoneController.text.length !=
-                            10) {
-                          return 'Enter a valid number';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Phone Number',
-                        hintText: 'Enter your Phone Number',
-                        prefixIcon: Icon(Icons.call),
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.transparent),
-                          borderRadius: BorderRadius.circular(10.0),
+                    SizedBox(
+                      height: 60,
+                      child: TextFormField(
+                        controller: editProfileController.phoneController,
+                        validator: (num) {
+                          if (editProfileController
+                              .phoneController.text.isEmpty) {
+                            return 'Enter number';
+                          } else if (editProfileController
+                                  .phoneController.text.length !=
+                              10) {
+                            return 'Enter a valid number';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Phone Number',
+                          hintText: 'Enter your Phone Number',
+                          prefixIcon: Icon(Icons.call),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.transparent),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.blue),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
+                        keyboardType: TextInputType.phone,
                       ),
-                      keyboardType: TextInputType.phone,
                     ),
                     const Gap(20),
-                    TextFormField(
-                      controller: editProfileController.emailController,
-                      validator: (num) {
-                        if (editProfileController
-                            .emailController.text.isEmpty) {
-                          return 'Enter Email';
-                        } else if (!GetUtils.isEmail(
-                            editProfileController.emailController.text)) {
-                          return 'Enter a valid email address';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Email Address',
-                        hintText: 'Enter your Email',
-                        prefixIcon: Icon(Icons.email),
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.transparent),
-                          borderRadius: BorderRadius.circular(10.0),
+                    SizedBox(
+                      height: 60,
+                      child: TextFormField(
+                        controller: editProfileController.emailController,
+                        validator: (num) {
+                          if (editProfileController
+                              .emailController.text.isEmpty) {
+                            return 'Enter Email';
+                          } else if (!GetUtils.isEmail(
+                              editProfileController.emailController.text)) {
+                            return 'Enter a valid email address';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Email Address',
+                          hintText: 'Enter your Email',
+                          prefixIcon: Icon(Icons.email),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.transparent),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.blue),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
+                        keyboardType: TextInputType.emailAddress,
                       ),
-                      keyboardType: TextInputType.emailAddress,
                     ),
                     const Gap(20),
                     Container(
@@ -217,6 +227,7 @@ class EditProfile extends GetView<EditProfileController> {
                         color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(8),
                       ),
+                      height: 60,
                       child: Obx(() => editProfileController
                               .isAddressLoaded.value
                           ? editProfileController.isAddressFound.value
@@ -346,7 +357,10 @@ class EditProfile extends GetView<EditProfileController> {
                                     }
                                   }
                                 },
-                                child: Text('Update'),
+                                child: Text(
+                                  'Update',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ),
                             ),
                     )

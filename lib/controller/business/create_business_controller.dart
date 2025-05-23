@@ -98,9 +98,15 @@ class CreateBusinessScreenController extends GetxController {
       if (response != null) {
         isProcess.value = false;
         if (response['data'] == null) {
+          // User already has business or other message
           if (response['message'] == 'User is already a business') {
             UserDataStorageServices.writeData(
               key: UserStorageDataKeys.isBusiness,
+              data: true,
+            );
+            // Also save that user has business request accepted
+            UserDataStorageServices.writeData(
+              key: UserStorageDataKeys.businessRequestAccepted,
               data: true,
             );
             Get.toNamed('/Business_address', arguments: {
@@ -109,15 +115,20 @@ class CreateBusinessScreenController extends GetxController {
               'image': selectedImage.value?.path ?? "",
             });
           } else {
-            ShowToast.toast(
-              msg: response['message'],
-            );
+            ShowToast.toast(msg: response['message']);
           }
         } else {
+          // Request sent, store request id and mark request sent
+          final data = jsonDecode(response.body)['data'];
           UserDataStorageServices.writeData(
             key: UserStorageDataKeys.reqBusinessId,
-            data: jsonDecode(response.body)['data']['_id'],
+            data: data['_id'],
           );
+          UserDataStorageServices.writeData(
+            key: UserStorageDataKeys.businessRequestSent,
+            data: true,
+          );
+
           MyDialog.alertDialog(
             onTap: () {
               Get.back();
@@ -128,13 +139,6 @@ class CreateBusinessScreenController extends GetxController {
                 "Your request to create a new business has been successfully sent to the admin. You will be notified once the request is reviewed and approved.",
           );
         }
-      } else {
-        isProcess.value = false;
-        ShowToast.errorSnackbar(
-          title: "Error",
-          msg:
-              "${jsonDecode(response.body)['message'] ?? "Something went wrong."}",
-        );
       }
     } on SocketException {
       isProcess.value = false;

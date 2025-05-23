@@ -1,4 +1,5 @@
 import 'package:pro_deals1/model_class/choose_plan_model.dart';
+import 'package:pro_deals1/widget/shimmerLoding.dart';
 
 import '../controller/premium_detail_controller.dart';
 import '../imports.dart';
@@ -23,120 +24,121 @@ class PremiumDetailPage extends StatelessWidget {
       backgroundColor: Colors.grey[200],
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Gap(20),
-            Container(
-              // width: 320,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColor.primary,
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Prices
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "₹${plan?.planPrice ?? 0}/${plan?.planDuration == "monthly" ? "month" : plan?.planDuration ?? "month"}",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold),
+        child: Obx(
+          () => controller.plan == null
+              ? const Center(child: Text("Plan data is not available"))
+              : Column(
+                  children: [
+                    Gap(20),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppColor.primary,
+                        borderRadius: BorderRadius.circular(25),
                       ),
-                      Text(
-                        "₹1100/year",
-                        style: TextStyle(color: Colors.white70, fontSize: 18),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // --- Pricing Display ---
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "₹${controller.plan.planCount != null && controller.plan.planCount != 0 ? (controller.plan.planPrice! / controller.plan.planCount!).ceil() : controller.plan.planPrice ?? 0}/${controller.plan.planDuration == "monthly" ? "month" : controller.plan.planDuration ?? "month"}",
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                "₹${controller.plan.planPrice ?? 0}/${(controller.plan.planCount ?? 1)} ${controller.plan.planDuration == "monthly" ? "mon" : controller.plan.planDuration ?? "month"}",
+                                style: const TextStyle(
+                                    color: Colors.white70, fontSize: 18),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Plan Title
+                          Text(
+                            controller.plan.planName ?? "",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          // Static Plan Description (now static and consistent)
+                          const Text(
+                            "Enjoy complete access to all features of this plan, including advanced tools, exclusive support, and more.",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                            ),
+                          ),
+
+                          const SizedBox(height: 25),
+
+                          // --- Dynamic Feature List from planDescription ---
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                              children:
+                                  controller.plan.planDescription?.map((desc) {
+                                        return Column(
+                                          children: [
+                                            FeatureRow(
+                                              icon: Icons.check_circle_outline,
+                                              text: desc,
+                                              bold: "",
+                                            ),
+                                            const SizedBox(height: 15),
+                                          ],
+                                        );
+                                      }).toList() ??
+                                      [],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Plan title
-                  Text(
-                    "${plan?.planName ?? ""}",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  ),
-
-                  const SizedBox(height: 8),
-                  const Text(
-                    "Enjoy complete access to Leafy-Garden Planner features for a full year.",
-                    style: TextStyle(color: Colors.white70),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // Features
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Column(
-                      children: const [
-                        FeatureRow(
-                            icon: Icons.auto_fix_high,
-                            text:
-                                "Create the perfect plan in seconds with the ",
-                            bold: "magic wand."),
-                        SizedBox(height: 15),
-                        FeatureRow(
-                            icon: Icons.task_alt,
-                            text: "Organize ",
-                            bold: "important tasks",
-                            endText: " for your garden."),
-                        SizedBox(height: 15),
-                        FeatureRow(
-                            icon: Icons.shopping_cart,
-                            text: "Year-round harvest with ",
-                            bold: "pre-and post-crops."),
-                        SizedBox(height: 15),
-                        FeatureRow(
-                            icon: Icons.nature,
-                            text: "Use proven ",
-                            bold: "companion planting plans."),
-                      ],
+                    Gap(20),
+                    GestureDetector(
+                      onTap: () => controller.isLoading.value
+                          ? null
+                          : controller.createSub(),
+                      child: ShimmerLoading(
+                        isLoading: controller.isLoading.value,
+                        child: Container(
+                          height: 50,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: AppColor.primary,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Buy Now",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Gap(30),
-            Obx(
-              () => GestureDetector(
-                onTap: controller.isLoading.value
-                    ? null
-                    : () {
-                        controller.createSub();
-                      },
-                child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: AppColor.primary,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    controller.isLoading.value
-                        ? "Loading..."
-                        : "Start Subscription",
-                    style: TextStyle(
-                      color: AppColor.white,
-                      fontSize: 16,
-                    ),
-                  ),
+                  ],
                 ),
-              ),
-            ),
-          ],
         ),
       ),
     );

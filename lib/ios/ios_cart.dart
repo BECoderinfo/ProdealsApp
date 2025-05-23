@@ -25,28 +25,37 @@ class ios_cart extends GetView<CartController> {
                 // Header
                 Stack(
                   children: [
-                    GestureDetector(
-                      onTap: () => Get.back(),
-                      child: Container(
-                        height: 24,
-                        width: 24,
-                        decoration: BoxDecoration(
-                          color: AppColor.white,
-                          borderRadius: BorderRadius.circular(4),
-                          boxShadow: [
-                            BoxShadow(
-                              offset: const Offset(0, 0),
-                              blurRadius: 2,
-                              color: AppColor.gray,
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          CupertinoIcons.arrow_left,
-                          size: 16,
-                          color: AppColor.black300,
-                        ),
-                      ),
+                    Builder(
+                      builder: (context) {
+                        return Navigator.canPop(context)
+                            ? GestureDetector(
+                                onTap: () {
+                                  Get.back();
+                                },
+                                child: Container(
+                                  height: 24,
+                                  width: 24,
+                                  decoration: BoxDecoration(
+                                    color: AppColor.white,
+                                    borderRadius: BorderRadius.circular(4),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        offset: const Offset(0, 0),
+                                        blurRadius: 2,
+                                        spreadRadius: 0,
+                                        color: AppColor.gray,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    CupertinoIcons.arrow_left,
+                                    size: 16,
+                                    color: AppColor.black300,
+                                  ),
+                                ),
+                              )
+                            : SizedBox.shrink();
+                      },
                     ),
                     Center(
                       child: Text(
@@ -158,18 +167,22 @@ class ios_cart extends GetView<CartController> {
                                       motion: const DrawerMotion(),
                                       children: [
                                         SlidableAction(
-                                          onPressed: (context) =>
-                                              cartController.confirmDelete(
-                                            onDeleteTap: () {
-                                              Get.back();
-                                              cartController.deleteItem(
-                                                  index: index);
-                                            },
-                                          ),
+                                          onPressed: (_) => cartController
+                                              .deleteItem(index: index),
                                           backgroundColor: Colors.red,
                                           foregroundColor: Colors.white,
                                           icon: Icons.delete,
                                           label: 'Delete',
+                                          autoClose: false,
+                                          spacing: 10,
+                                          // Adjust the space between actions (optional)
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 16),
+                                          // Adjust padding to prevent oversize
+                                          flex: 1,
+                                          // Ensures the action button takes up the full available width of the pane
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
                                       ],
                                     ),

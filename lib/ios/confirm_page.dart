@@ -44,7 +44,7 @@ class confirm extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: GestureDetector(
                 onTap: () {
-                  currentPageIndex.value = 0;
+                  // currentPageIndex.value = AppPage.home;
                   Get.toNamed('/navigation');
                 },
                 child: Container(

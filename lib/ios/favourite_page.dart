@@ -23,31 +23,37 @@ class iosFavourite extends GetView<FavouriteController> {
                 Gap(30),
                 Stack(
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        Get.back();
+                    Builder(
+                      builder: (context) {
+                        return Navigator.canPop(context)
+                            ? GestureDetector(
+                                onTap: () {
+                                  Get.back();
+                                },
+                                child: Container(
+                                  height: 24,
+                                  width: 24,
+                                  decoration: BoxDecoration(
+                                    color: AppColor.white,
+                                    borderRadius: BorderRadius.circular(4),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        offset: const Offset(0, 0),
+                                        blurRadius: 2,
+                                        spreadRadius: 0,
+                                        color: AppColor.gray,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    CupertinoIcons.arrow_left,
+                                    size: 16,
+                                    color: AppColor.black300,
+                                  ),
+                                ),
+                              )
+                            : SizedBox.shrink();
                       },
-                      child: Container(
-                        height: 24,
-                        width: 24,
-                        decoration: BoxDecoration(
-                          color: AppColor.white,
-                          borderRadius: BorderRadius.circular(4),
-                          boxShadow: [
-                            BoxShadow(
-                              offset: const Offset(0, 0),
-                              blurRadius: 2,
-                              spreadRadius: 0,
-                              color: AppColor.gray,
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          CupertinoIcons.arrow_left,
-                          size: 16,
-                          color: AppColor.black300,
-                        ),
-                      ),
                     ),
                     Center(
                       child: Text(
@@ -61,7 +67,7 @@ class iosFavourite extends GetView<FavouriteController> {
                     ),
                   ],
                 ),
-                // const Gap(20),
+                const Gap(20),
                 Expanded(
                   child: Obx(
                     () => controller.list.isEmpty
@@ -78,108 +84,123 @@ class iosFavourite extends GetView<FavouriteController> {
                               ),
                             ),
                           )
-                        : ListView.builder(
-                            itemCount: controller.list.length,
+                        : ListView.separated(
+                            padding: EdgeInsets.all(0),
                             shrinkWrap: true,
+                            // physics: const NeverScrollableScrollPhysics(),
+                            separatorBuilder: (context, index) => const Gap(14),
+                            itemCount: controller.list.length,
                             itemBuilder: (context, index) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 6.0),
-                                child: Card(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      /// change the page name after completing
-                                      Get.toNamed('/and_restaurant_details',
-                                          arguments: {
-                                            'rId': controller.list[index].sId ??
-                                                "",
-                                          })?.then((e) {
-                                        controller.getAllFavouriteBusiness();
-                                        Get.delete<
-                                            AndroidBusinessDetailController>();
-                                      });
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 75,
-                                          height: 75,
-                                          decoration: BoxDecoration(
+                              final item = controller.list[index];
+
+                              return Center(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Get.toNamed('/restaurant_details',
+                                        arguments: {
+                                          'rId': item.sId ?? "",
+                                        })?.then((e) {
+                                      Get.delete<
+                                          AndroidBusinessDetailController>();
+                                    });
+                                  },
+                                  child: Container(
+                                    height: wid / 4.8,
+                                    width: wid - 34,
+                                    decoration: BoxDecoration(
+                                      color: AppColor.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.08),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                          spreadRadius: 1,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(6.0),
+                                      child: Row(
+                                        children: [
+                                          ClipRRect(
                                             borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                              bottomLeft: Radius.circular(10),
-                                            ),
+                                                BorderRadius.circular(10),
                                             child: Image.memory(
                                               Uint8List.fromList(
-                                                controller.list[index].image,
+                                                controller.list[index].image!,
                                               ),
                                               fit: BoxFit.cover,
+                                              width: wid / 4.6,
+                                              height: wid / 5,
                                             ),
                                           ),
-                                        ),
-                                        Gap(10),
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                controller.list[index].name,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.location_city,
-                                                    size: 14,
-                                                    color: AppColor.gray,
-                                                  ),
-                                                  Gap(5),
-                                                  Expanded(
-                                                    child: Text(
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      "${controller.list[index].address}",
-                                                      style: TextStyle(
-                                                          color: AppColor.gray),
+                                          const Gap(20),
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    controller
+                                                            .list[index].name ??
+                                                        "",
+                                                    style: GoogleFonts.openSans(
+                                                      color: AppColor.black300,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.star,
-                                                    color: AppColor.primary,
-                                                    size: 16,
+                                                ),
+                                                Text(
+                                                  "${controller.list[index].category ?? 'No Category'} • ${controller.list[index].address ?? 'No Address'}",
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    color: AppColor.black300,
+                                                    fontSize: 12,
                                                   ),
-                                                  Text(
-                                                    "${controller.list[index].ratting}",
-                                                    style: TextStyle(
-                                                        color:
-                                                            AppColor.primary),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        Gap(10),
-                                        IconButton(
-                                          icon: Icon(Icons.favorite_rounded),
-                                          onPressed: () {
-                                            controller.removeFavourite(
-                                              index: index,
-                                            );
-                                          },
-                                        )
-                                      ],
+                                          const Gap(8),
+                                          Container(
+                                            width: 1,
+                                            color: Colors.grey.withOpacity(0.5),
+                                          ),
+                                          const Gap(8),
+                                          Container(
+                                            width: wid / 9,
+                                            height: hit,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                SvgPicture.asset(
+                                                    'assets/icons/Star.svg'),
+                                                Text(
+                                                  double.parse(controller
+                                                              .list[index]
+                                                              .ratting ??
+                                                          "0.0")
+                                                      .toStringAsFixed(1),
+                                                  style: GoogleFonts.openSans(
+                                                    color: AppColor.black300,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),

@@ -25,7 +25,7 @@ class splash extends StatelessWidget {
                 key: UserStorageDataKeys.cPanel,
               ) ==
               '${panel.user}') {
-        currentPageIndex.value = 0;
+        currentPageIndex.value = AppPage.home;
         Get.offNamed('/navigation');
       } else {
         Get.offNamed('/intro');
