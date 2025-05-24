@@ -23,8 +23,10 @@ class _NavigationState extends State<Navigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true, // This is the key line
-      backgroundColor: AppColor.primary, // Your page background
+      extendBody: (currentPageIndex.value == AppPage.cart) ? true : false,
+      // This is the key line
+      backgroundColor: AppColor.primary,
+      // Your page background
       body: ValueListenableBuilder<AppPage>(
         valueListenable: currentPageIndex,
         builder: (context, currentPage, child) {

@@ -5,8 +5,8 @@ String Phone = "";
 bool isBusiness = false;
 var ImageB = "";
 
-// String host = "http://141.148.196.197:3001/";
-String host = "http://192.168.1.4:3001/";
+String host = "http://141.148.196.197:3001/";
+// String host = "http://192.168.1.4:3001/";
 // String host = "https://prodeal.onrender.com/";
 
 class Apis {
@@ -14,9 +14,10 @@ class Apis {
   static const Map<String, String> headersValue = {
     'Content-Type': 'application/json'
   };
-  static const String serverAddress = "http://192.168.1.4:3001/";
 
-  // static const String serverAddress = "http://141.148.196.197:3001/";
+  // static const String serverAddress = "http://192.168.1.4:3001/";
+
+  static const String serverAddress = "http://141.148.196.197:3001/";
 
   /// user apis
   static Uri loginUser = Uri.parse("${serverAddress}users/login");
